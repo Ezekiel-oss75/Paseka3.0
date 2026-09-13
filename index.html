@@ -1,0 +1,2465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Пасека">
+<meta name="theme-color" content="#f6b93b">
+<title>🐝 Пасека</title>
+<style>
+  :root {
+    --bg: #f5f0e1; --bg-pattern: #e8d9a8;
+    --card: rgba(255,255,255,.96); --card-solid: #fff;
+    --text: #2c2c2c; --text-muted: #888; --text-label: #6b5b2f;
+    --primary: #f6b93b; --primary-dark: #e58e26; --primary-soft: #fdf3d9;
+    --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; --info: #3498db;
+    --border: #f0ead5; --input-bg: #fdfaf1; --input-border: #e0d5b7;
+    --shadow: rgba(0,0,0,.06);
+    --header-grad: linear-gradient(135deg, #f6b93b, #e58e26);
+    --nav-bg: #fff;
+  }
+  body.theme-dark {
+    --bg: #1a1a1f; --bg-pattern: #2a2a30;
+    --card: rgba(40,40,48,.96); --card-solid: #28282f;
+    --text: #e8e8ec; --text-muted: #909099; --text-label: #d0c9a8;
+    --primary-soft: #3a3222;
+    --success: #2ecc71; --danger: #ff6b5b; --info: #5dade2;
+    --border: #3a3a42; --input-bg: #2a2a32; --input-border: #4a4a52;
+    --shadow: rgba(0,0,0,.35);
+    --header-grad: linear-gradient(135deg, #2c2c34, #1a1a1f);
+    --nav-bg: #22222a;
+  }
+  body.theme-nature {
+    --bg: #e8f0e3; --bg-pattern: #c8dcc0;
+    --card: rgba(255,255,255,.96); --card-solid: #fff;
+    --text: #1f2d1a; --text-muted: #6b7a62; --text-label: #3d5233;
+    --primary: #6ab04c; --primary-dark: #4e8c36; --primary-soft: #e0f0d8;
+    --border: #d0e0c4; --input-bg: #f5faf0; --input-border: #c8dcc0;
+    --header-grad: linear-gradient(135deg, #6ab04c, #4e8c36);
+    --nav-bg: #fff;
+  }
+  body.theme-rose {
+    --bg: #fceef3; --bg-pattern: #f5d5e0;
+    --card: rgba(255,255,255,.96); --card-solid: #fff;
+    --text: #3a1f2e; --text-muted: #8a6b78; --text-label: #6b3d50;
+    --primary: #e91e63; --primary-dark: #c2185b; --primary-soft: #fce4ec;
+    --border: #f5d5e0; --input-bg: #fef7fa; --input-border: #f0c5d5;
+    --header-grad: linear-gradient(135deg, #e91e63, #c2185b);
+    --nav-bg: #fff;
+  }
+  body.theme-neon {
+    --bg: #0a0a1a; --bg-pattern: #1a1a3a;
+    --card: rgba(20,20,40,.96); --card-solid: #141428;
+    --text: #e0e0ff; --text-muted: #8080a0; --text-label: #c0c0e0;
+    --primary: #00f5ff; --primary-dark: #00c4cc; --primary-soft: #001a20;
+    --success: #00ff88; --danger: #ff0080; --warning: #ffaa00;
+    --border: #2a2a50; --input-bg: #1a1a30; --input-border: #3a3a70;
+    --shadow: rgba(0,245,255,.15);
+    --header-grad: linear-gradient(135deg, #0a0a1a, #1a1a3a);
+    --nav-bg: #0f0f22;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin:0; font-family:-apple-system,'SF Pro',Roboto,sans-serif; color:var(--text);
+    padding-bottom:calc(76px + env(safe-area-inset-bottom)); padding-top:env(safe-area-inset-top);
+    background-color:var(--bg);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'><g fill='none' stroke='%23e8d9a8' stroke-width='1.2'><path d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z'/><path d='M28 64 L56 80 L56 112 M28 64 L0 80 L0 112'/><path d='M28 33 L56 49 M28 33 L0 49' transform='translate(0,31)'/></g></svg>");
+    background-size:56px 97px;
+    transition: background-color .3s, color .3s;
+  }
+  input, select, textarea, button { -webkit-user-select:text; user-select:text; font-family:inherit; color:inherit; }
+  header { background:var(--header-grad); color:#fff; padding:14px 16px; position:sticky; top:0; z-index:10; box-shadow:0 2px 12px var(--shadow); }
+  header h1 { margin:0; font-size:19px; display:flex; align-items:center; gap:8px; }
+  header .sub { font-size:12px; opacity:.92; margin-top:3px; }
+  .back { background:rgba(255,255,255,.25); border:none; color:#fff; font-size:15px; padding:6px 12px; border-radius:8px; margin-bottom:8px; cursor:pointer; }
+  .screen { display:none; padding:14px; }
+  .screen.active { display:block; animation:fade .25s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  .card { background:var(--card); border-radius:16px; padding:16px; margin-bottom:12px; box-shadow:0 2px 8px var(--shadow); backdrop-filter:blur(8px); transition: background-color .3s, box-shadow .3s; }
+  .card h2 { margin:0 0 12px; font-size:16px; display:flex; justify-content:space-between; align-items:center; color:var(--text); }
+  .card h2 .cnt { font-size:12px; color:var(--text-muted); font-weight:400; }
+  .btn { display:block; width:100%; padding:14px; border:none; border-radius:12px; background:var(--primary); color:#fff; font-size:16px; font-weight:600; margin-bottom:8px; cursor:pointer; transition:.15s; }
+  .btn:active { transform:scale(.97); background:var(--primary-dark); }
+  .btn.sec { background:var(--card-solid); color:var(--primary); border:2px solid var(--primary); }
+  .btn.sec:active { background:var(--primary-soft); }
+  .btn.sm { padding:9px; font-size:14px; margin:0; }
+  .btn.green { background:var(--success); }
+  .btn.red { background:var(--danger); }
+  .btn.blue { background:var(--info); }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  input, select, textarea { width:100%; padding:11px; border:1.5px solid var(--input-border); border-radius:10px; font-size:15px; margin-bottom:10px; background:var(--input-bg); color:var(--text); }
+  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--primary); }
+  label { font-size:13px; color:var(--text-label); font-weight:600; display:block; margin-bottom:4px; }
+  nav { position:fixed; bottom:0; left:0; right:0; background:var(--nav-bg); display:flex; border-top:1px solid var(--border); padding-bottom:env(safe-area-inset-bottom); z-index:20; }
+  nav button { flex:1; border:none; background:none; padding:7px 1px; font-size:9px; color:var(--text-muted); cursor:pointer; transition:.15s; }
+  nav button.active { color:var(--primary); font-weight:600; }
+  nav button .ico { display:block; font-size:19px; margin-bottom:1px; }
+  .row { display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid var(--border); font-size:14px; }
+  .row:last-child { border:none; }
+  .row.clickable { cursor:pointer; }
+  .row.clickable:active { background:var(--primary-soft); border-radius:8px; }
+  .badge { background:var(--primary); color:#fff; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+  .badge.green { background:var(--success); }
+  .badge.red { background:var(--danger); }
+  .badge.gray { background:#ccc; }
+  .task { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px dashed var(--border); font-size:14px; cursor:pointer; }
+  .task:last-child { border:none; }
+  .task.done span { text-decoration:line-through; color:var(--text-muted); }
+  .checkbox { width:22px; height:22px; border-radius:6px; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:14px; color:#fff; transition:.15s; }
+  .task.done .checkbox { background:var(--success); border-color:var(--success); }
+  .stat { text-align:center; padding:8px 4px; }
+  .stat .num { font-size:22px; font-weight:700; color:var(--primary-dark); }
+  .stat .lbl { font-size:11px; color:var(--text-muted); }
+  .toast { position:fixed; bottom:calc(90px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); background:#2c2c2c; color:#fff; padding:11px 20px; border-radius:30px; font-size:14px; opacity:0; transition:.3s; pointer-events:none; z-index:100; white-space:nowrap; max-width:90vw; }
+  .toast.show { opacity:1; }
+  .season { display:inline-block; padding:8px 16px; border-radius:20px; font-size:13px; margin:0 6px 8px 0; background:var(--primary-soft); cursor:pointer; color:var(--text-label); }
+  .season.active { background:var(--primary); color:#fff; font-weight:600; }
+  .progress { height:8px; background:var(--border); border-radius:10px; overflow:hidden; margin-top:6px; }
+  .progress > div { height:100%; background:linear-gradient(90deg, var(--primary), var(--success)); transition:.4s; }
+  .empty { color:var(--text-muted); font-size:14px; text-align:center; padding:16px 0; }
+  .tabs { display:flex; gap:6px; margin-bottom:12px; overflow-x:auto; padding-bottom:4px; }
+  .tabs::-webkit-scrollbar { display:none; }
+  .tabs button { flex-shrink:0; padding:8px 14px; border:none; background:var(--primary-soft); color:var(--text-label); border-radius:20px; font-size:13px; cursor:pointer; }
+  .tabs button.active { background:var(--primary); color:#fff; font-weight:600; }
+  .info { background:var(--primary-soft); border-left:3px solid var(--primary); padding:10px 12px; border-radius:8px; font-size:13px; color:var(--text-label); margin-bottom:10px; line-height:1.5; }
+  .xp-bar { height:12px; background:var(--border); border-radius:10px; overflow:hidden; margin:8px 0 4px 0; position:relative; }
+  .xp-bar > div { height:100%; background:linear-gradient(90deg, var(--primary), var(--primary-dark)); transition:.4s; position:relative; }
+  .xp-bar > div::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent); animation:shine 2s infinite; }
+  @keyframes shine { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+  .lvl-badge { display:inline-block; background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff; padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700; box-shadow:0 2px 8px rgba(246,185,59,.4); }
+  .ach { display:flex; align-items:center; gap:10px; padding:10px; background:var(--input-bg); border-radius:10px; margin-bottom:8px; border:1px solid var(--border); transition:.15s; }
+  .ach.locked { opacity:.45; filter:grayscale(.7); }
+  .ach .ico { font-size:26px; width:36px; text-align:center; }
+  .ach .txt { flex:1; }
+  .ach .name { font-size:14px; font-weight:600; }
+  .ach .desc { font-size:11px; color:var(--text-muted); }
+  .cat-card { background:var(--card); border-radius:12px; padding:14px; margin-bottom:10px; cursor:pointer; display:flex; align-items:center; gap:12px; transition:.15s; box-shadow:0 1px 4px var(--shadow); }
+  .cat-card:active { transform:scale(.98); background:var(--primary-soft); }
+  .cat-card .ico { font-size:32px; width:44px; text-align:center; }
+  .cat-card .title { font-size:15px; font-weight:600; }
+  .cat-card .sub { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .modal { position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:200; display:none; align-items:flex-end; }
+  .modal.show { display:flex; animation:fadeIn .2s; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .modal-content { background:var(--card-solid); width:100%; max-height:88vh; border-radius:22px 22px 0 0; padding:22px; overflow-y:auto; padding-bottom:calc(22px + env(safe-area-inset-bottom)); animation:slideUp .25s ease; }
+  @keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:none;opacity:1} }
+  .modal-content h2 { margin:0 0 12px; font-size:18px; }
+  .finance-item { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); font-size:14px; }
+  .finance-item:last-child { border:none; }
+  .amount-in { color:var(--success); font-weight:600; }
+  .amount-out { color:var(--danger); font-weight:600; }
+  .health { display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+  .health.green { background:var(--success); box-shadow:0 0 8px rgba(39,174,96,.6); }
+  .health.yellow { background:var(--warning); box-shadow:0 0 8px rgba(243,156,18,.6); }
+  .health.red { background:var(--danger); box-shadow:0 0 8px rgba(231,76,60,.6); animation:pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .reminder { background:var(--input-bg); border-left:3px solid var(--primary); padding:10px 12px; border-radius:8px; margin-bottom:8px; font-size:13px; }
+  .reminder.overdue { border-left-color:var(--danger); background:rgba(231,76,60,.08); }
+  .reminder.soon { border-left-color:var(--warning); background:rgba(243,156,18,.08); }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:10px; }
+  .cal-day { aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:8px; font-size:12px; cursor:pointer; background:var(--input-bg); position:relative; transition:.15s; }
+  .cal-day.today { background:var(--primary); color:#fff; font-weight:700; }
+  .cal-day.sel { background:var(--primary-soft); font-weight:600; }
+  .cal-day.other { opacity:.3; }
+  .cal-day .dots { display:flex; gap:2px; margin-top:2px; }
+  .cal-day .dot { width:4px; height:4px; border-radius:50%; }
+  .chart { display:flex; align-items:flex-end; gap:4px; height:120px; padding:10px 0 24px 0; border-bottom:1px solid var(--border); margin-bottom:8px; }
+  .chart .bar { flex:1; background:linear-gradient(180deg, var(--primary), var(--primary-dark)); border-radius:4px 4px 0 0; min-height:4px; position:relative; }
+  .chart .bar span { position:absolute; bottom:-20px; left:50%; transform:translateX(-50%); font-size:9px; color:var(--text-muted); white-space:nowrap; }
+  .chart .bar b { position:absolute; top:-16px; left:50%; transform:translateX(-50%); font-size:10px; color:var(--primary-dark); }
+  .calc-result { background:var(--primary-soft); border:2px dashed var(--primary); border-radius:12px; padding:14px; text-align:center; margin-top:10px; }
+  .calc-result .num { font-size:26px; font-weight:700; color:var(--primary-dark); }
+  .calc-result .lbl { font-size:12px; color:var(--text-muted); margin-top:4px; }
+  .scheme { position:relative; height:400px; background:var(--input-bg); border-radius:12px; border:2px dashed var(--border); overflow:hidden; }
+  .hive-pin { position:absolute; width:50px; height:50px; border-radius:12px; background:var(--primary); color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:10px; font-weight:700; cursor:pointer; box-shadow:0 4px 10px var(--shadow); transform:translate(-50%,-50%); transition:.15s; }
+  .hive-pin:active { transform:translate(-50%,-50%) scale(.9); }
+  .hive-pin.green { background:var(--success); }
+  .hive-pin.yellow { background:var(--warning); }
+  .hive-pin.red { background:var(--danger); }
+  .hive-pin .n { font-size:14px; }
+  .tree-node { padding:10px 14px; background:var(--input-bg); border-left:3px solid var(--primary); border-radius:8px; margin:8px 0; font-size:13px; }
+  .tree-node .name { font-weight:600; color:var(--primary-dark); }
+  .tree-node .meta { font-size:11px; color:var(--text-muted); margin-top:2px; }
+  .quest { background:linear-gradient(135deg, var(--primary-soft), var(--input-bg)); border:1px solid var(--primary); border-radius:12px; padding:12px; margin-bottom:10px; position:relative; overflow:hidden; }
+  .quest::before { content:''; position:absolute; top:0; right:0; width:60px; height:60px; background:radial-gradient(circle, rgba(246,185,59,.25), transparent 70%); pointer-events:none; }
+  .quest .title { font-weight:700; font-size:14px; color:var(--primary-dark); }
+  .quest .desc { font-size:12px; color:var(--text-label); margin-top:4px; }
+  .quest .reward { font-size:11px; color:var(--success); margin-top:6px; font-weight:600; }
+  .photo-thumb { width:80px; height:80px; border-radius:8px; object-fit:cover; margin:4px 4px 0 0; border:1px solid var(--border); }
+  .menu-item { display:flex; align-items:center; gap:14px; padding:14px; background:var(--card-solid); border-radius:12px; margin-bottom:10px; cursor:pointer; box-shadow:0 1px 4px var(--shadow); transition:.15s; }
+  .menu-item:active { background:var(--primary-soft); transform:scale(.99); }
+  .menu-item .mi { font-size:28px; width:40px; text-align:center; }
+  .menu-item .mt { flex:1; }
+  .menu-item .mt .t { font-weight:600; font-size:15px; }
+  .menu-item .mt .s { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .pet-card { background:linear-gradient(135deg, var(--primary-soft), var(--card-solid)); border-radius:16px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; border:1px solid var(--primary); }
+  .pet-card::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background:radial-gradient(circle, rgba(246,185,59,.25), transparent 70%); pointer-events:none; }
+  .pet-row { display:flex; align-items:center; gap:14px; position:relative; z-index:1; }
+  .pet-avatar { width:70px; height:70px; border-radius:50%; background:linear-gradient(135deg, #ffe58a, #f6b93b); display:flex; align-items:center; justify-content:center; font-size:38px; box-shadow:0 4px 12px rgba(246,185,59,.4); animation:float 3s ease-in-out infinite; flex-shrink:0; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  .pet-info { flex:1; }
+  .pet-name { font-size:15px; font-weight:700; color:var(--text); }
+  .pet-stage { font-size:12px; color:var(--text-muted); margin-top:2px; }
+  .pet-speech { background:var(--card-solid); border-radius:12px; padding:10px 12px; margin-top:12px; font-size:13px; color:var(--text); position:relative; line-height:1.4; border:1px solid var(--border); }
+  .pet-speech::before { content:''; position:absolute; top:-8px; left:24px; width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-bottom:8px solid var(--card-solid); }
+  .weather-card { background:linear-gradient(135deg, #4a90e2, #357abd); color:#fff; border-radius:16px; padding:16px; margin-bottom:12px; position:relative; overflow:hidden; cursor:pointer; }
+  .weather-card.rain { background:linear-gradient(135deg, #5a7a9a, #3a5a7a); }
+  .weather-card.sun { background:linear-gradient(135deg, #f6b93b, #e58e26); }
+  .weather-card.cloud { background:linear-gradient(135deg, #7a8a9a, #5a6a7a); }
+  .weather-row { display:flex; align-items:center; gap:14px; position:relative; z-index:1; }
+  .weather-ico { font-size:44px; }
+  .weather-info { flex:1; }
+  .weather-temp { font-size:24px; font-weight:700; }
+  .weather-desc { font-size:13px; opacity:.9; margin-top:2px; }
+  .weather-advice { font-size:12px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,.2); position:relative; z-index:1; line-height:1.4; }
+  .label-preview { background:linear-gradient(135deg, #fff9e6, #ffe58a); border:3px double var(--primary-dark); border-radius:12px; padding:20px; text-align:center; color:#5a4a20; margin-bottom:12px; min-height:140px; display:flex; flex-direction:column; justify-content:center; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+  .label-honey { font-size:13px; letter-spacing:2px; color:#8a7030; text-transform:uppercase; }
+  .label-sort { font-size:22px; font-weight:700; margin:6px 0; color:#3a2a10; }
+  .label-weight { font-size:16px; color:#5a4a20; }
+  .label-year { font-size:13px; color:#8a7030; margin-top:6px; }
+  .label-beekeeper { font-size:11px; color:#8a7030; margin-top:10px; font-style:italic; }
+  .fact-card { background:linear-gradient(135deg, var(--primary-soft), var(--card-solid)); border-left:4px solid var(--primary); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .fact-card .ftitle { font-size:12px; font-weight:700; color:var(--primary-dark); text-transform:uppercase; letter-spacing:1px; }
+  .fact-card .ftext { font-size:14px; color:var(--text); margin-top:6px; line-height:1.5; }
+  .search-bar { position:relative; margin-bottom:12px; }
+  .search-bar input { padding-left:40px; margin:0; font-size:16px; }
+  .search-bar::before { content:'🔍'; position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:18px; pointer-events:none; }
+  .theme-picker { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-top:10px; }
+  .theme-opt { aspect-ratio:1; border-radius:12px; cursor:pointer; border:3px solid transparent; display:flex; align-items:center; justify-content:center; font-size:22px; transition:.15s; position:relative; }
+  .theme-opt.active { border-color:var(--primary); box-shadow:0 0 0 3px var(--primary-soft); }
+  .theme-opt:active { transform:scale(.93); }
+  .theme-opt.honey { background:linear-gradient(135deg, #f6b93b, #e58e26); }
+  .theme-opt.dark { background:linear-gradient(135deg, #2c2c34, #1a1a1f); }
+  .theme-opt.nature { background:linear-gradient(135deg, #6ab04c, #4e8c36); }
+  .theme-opt.rose { background:linear-gradient(135deg, #e91e63, #c2185b); }
+  .theme-opt.neon { background:linear-gradient(135deg, #00f5ff, #00c4cc); }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="back" id="backBtn" style="display:none" onclick="goBack()">← Назад</button>
+  <h1 id="pageTitle">🐝 Пасека</h1>
+  <div class="sub" id="today"></div>
+</header>
+
+<!-- ГЛАВНАЯ -->
+<div class="screen active" id="s-home">
+  <div class="pet-card">
+    <div class="pet-row">
+      <div class="pet-avatar" id="pet-avatar">🥚</div>
+      <div class="pet-info">
+        <div class="pet-name" id="pet-name">Улейка</div>
+        <div class="pet-stage" id="pet-stage">Стадия: Яйцо</div>
+        <div class="xp-bar" style="margin-top:6px"><div id="pet-progress" style="width:0%"></div></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px" id="pet-xp">0 / 50 XP</div>
+      </div>
+    </div>
+    <div class="pet-speech" id="pet-speech">Привет! Я твой помощник 🐝</div>
+  </div>
+  <div class="weather-card" id="weather-card" onclick="go('s-weather')">
+    <div class="weather-row">
+      <div class="weather-ico" id="w-ico">🌤</div>
+      <div class="weather-info">
+        <div class="weather-temp" id="w-temp">+18°C</div>
+        <div class="weather-desc" id="w-desc">Ясно · лёгкий ветер</div>
+      </div>
+      <div style="font-size:11px;opacity:.8">изменить ›</div>
+    </div>
+    <div class="weather-advice" id="w-advice">Хороший день для осмотра</div>
+  </div>
+  <div class="card">
+    <div class="grid3">
+      <div class="stat"><div class="num" id="st-hives">0</div><div class="lbl">Ульев</div></div>
+      <div class="stat"><div class="num" id="st-visits">0</div><div class="lbl">Осмотров</div></div>
+      <div class="stat"><div class="num" id="st-honey">0</div><div class="lbl">кг мёда</div></div>
+    </div>
+  </div>
+  <div class="fact-card">
+    <div class="ftitle">💡 Факт дня</div>
+    <div class="ftext" id="fact-text">Матка откладывает до 2000 яиц в сутки.</div>
+  </div>
+  <div class="card" id="alerts-card" style="display:none">
+    <h2>🚨 Требует внимания <span class="cnt" id="alerts-cnt"></span></h2>
+    <div id="alerts-list"></div>
+  </div>
+  <div class="card clickable" onclick="go('s-reminders')" style="cursor:pointer">
+    <h2>🔔 Ближайшие напоминания <span class="cnt" id="reminders-cnt"></span></h2>
+    <div id="reminders-preview"></div>
+  </div>
+  <div class="card">
+    <h2>🌸 Прогресс сезона <span class="cnt" id="season-name"></span></h2>
+    <div class="progress"><div id="season-progress" style="width:0%"></div></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:6px" id="season-info"></div>
+    <button class="btn sec sm" style="margin-top:10px" onclick="go('s-season')">Открыть сезонные работы</button>
+  </div>
+  <div class="card">
+    <h2>🎯 Ежедневные задания</h2>
+    <div id="daily-tasks"></div>
+  </div>
+  <div class="card">
+    <h2>⚡ Быстрые действия</h2>
+    <div class="grid">
+      <button class="btn" onclick="openVisitForm()">📋 Осмотр</button>
+      <button class="btn" onclick="openFeedForm()">🍯 Подкормка</button>
+      <button class="btn" onclick="openTreatForm()">💊 Обработка</button>
+      <button class="btn" onclick="openProductForm()">📦 Продукция</button>
+    </div>
+  </div>
+</div>
+
+<!-- УЛЬИ -->
+<div class="screen" id="s-hives">
+  <div class="info">🐝 <b>Ульи</b> — карточки семей.</div>
+  <div class="card">
+    <h2>🐝 Мои ульи <span class="cnt" id="hives-cnt"></span></h2>
+    <div id="hives-list"></div>
+  </div>
+  <button class="btn" onclick="addHive()">➕ Добавить улей</button>
+  <button class="btn sec" onclick="go('s-scheme')">🗺 Схема пасеки</button>
+</div>
+
+<!-- СХЕМА -->
+<div class="screen" id="s-scheme">
+  <div class="info">🗺 <b>Схема</b> — тап по улью из списка, затем тап по полю.</div>
+  <div class="card">
+    <h2>🗺 Расположение</h2>
+    <div class="scheme" id="scheme-area" onclick="schemeClick(event)"></div>
+    <p style="font-size:12px;color:var(--text-muted);text-align:center;margin-top:8px" id="scheme-hint">Выберите улей</p>
+  </div>
+  <div class="card">
+    <h2>🐝 Ульи без места</h2>
+    <div id="unplaced-list"></div>
+  </div>
+</div>
+
+<!-- КАРТОЧКА УЛЬЯ -->
+<div class="screen" id="s-hive">
+  <div class="card">
+    <h2 id="hive-title">Улей</h2>
+    <div id="hive-info"></div>
+    <div class="grid" style="margin-top:12px">
+      <button class="btn sm" onclick="editHive()">✏️ Редактировать</button>
+      <button class="btn sm red" onclick="deleteHive()">🗑 Удалить</button>
+    </div>
+  </div>
+  <div class="tabs" id="hive-tabs">
+    <button class="active" onclick="hiveTab('visits',this)">📋 Осмотры</button>
+    <button onclick="hiveTab('treats',this)">💊 Обработки</button>
+    <button onclick="hiveTab('feeds',this)">🍯 Подкормки</button>
+    <button onclick="hiveTab('products',this)">📦 Продукция</button>
+    <button onclick="hiveTab('photos',this)">📸 Фото</button>
+    <button onclick="hiveTab('notes',this)">📝 Заметки</button>
+  </div>
+  <div class="card" id="hive-content"></div>
+</div>
+
+<!-- ФОРМЫ -->
+<div class="screen" id="s-visit">
+  <div class="info">📋 <b>Осмотр</b> — каждые 7–10 дней.</div>
+  <div class="card">
+    <h2>📋 Новый осмотр</h2>
+    <label>Улей</label><select id="v-hive"></select>
+    <label>Дата</label><input type="date" id="v-date">
+    <label>Сила семьи (1–10)</label><input type="number" id="v-power" min="1" max="10" value="5">
+    <label>Матка</label>
+    <select id="v-queen"><option>Есть, плодная</option><option>Есть, неплодная</option><option>Нет</option><option>Замена</option></select>
+    <label>Расплод</label>
+    <select id="v-brood"><option>Открытый + закрытый</option><option>Только открытый</option><option>Только закрытый</option><option>Нет</option></select>
+    <label>Корм (кг)</label><input type="number" id="v-food" value="0" step="0.1">
+    <label>Поведение</label>
+    <select id="v-behavior"><option>Спокойные</option><option>Умеренно агрессивные</option><option>Агрессивные</option></select>
+    <label>Заметка</label><textarea id="v-note" rows="2"></textarea>
+    <label>📸 Фото</label><input type="file" id="v-photo" accept="image/*" capture="environment">
+    <button class="btn" onclick="saveVisit()">💾 Сохранить (+5 XP)</button>
+  </div>
+</div>
+
+<div class="screen" id="s-treat">
+  <div class="info">💊 <b>Обработка</b> — не при медосборе!</div>
+  <div class="card">
+    <h2>💊 Новая обработка</h2>
+    <label>Улей</label><select id="t-hive"></select>
+    <label>Дата</label><input type="date" id="t-date">
+    <label>Препарат</label><input type="text" id="t-drug">
+    <label>От чего</label>
+    <select id="t-against"><option>Клещ варроа</option><option>Нозематоз</option><option>Аскосфероз</option><option>Гнилец</option><option>Профилактика</option></select>
+    <label>Дозировка</label><input type="text" id="t-dose">
+    <label>Повтор через (дней)</label><input type="number" id="t-repeat" value="0">
+    <label>Заметка</label><textarea id="t-note" rows="2"></textarea>
+    <button class="btn" onclick="saveTreat()">💾 Сохранить (+5 XP)</button>
+  </div>
+</div>
+
+<div class="screen" id="s-feed">
+  <div class="info">🍯 <b>Подкормка</b> — весной 1:1, осенью 2:1, зимой канди.</div>
+  <div class="card">
+    <h2>🍯 Новая подкормка</h2>
+    <label>Улей</label><select id="f-hive"></select>
+    <label>Дата</label><input type="date" id="f-date">
+    <label>Тип</label>
+    <select id="f-type"><option>Сахарный сироп 1:1</option><option>Сахарный сироп 2:1</option><option>Канди</option><option>Медовая сыта</option><option>Белковая</option></select>
+    <label>Количество</label><input type="number" id="f-qty" step="0.1">
+    <label>Заметка</label><textarea id="f-note" rows="2"></textarea>
+    <button class="btn" onclick="saveFeed()">💾 Сохранить (+3 XP)</button>
+  </div>
+</div>
+
+<!-- МАТКИ -->
+<div class="screen" id="s-queens">
+  <div class="info">👑 <b>Матководство</b> — цикл 21 день.</div>
+  <div class="card">
+    <h2>👑 Вывод маток</h2>
+    <button class="btn" onclick="startQueenCycle()">🐝 Начать цикл</button>
+    <div id="queen-cycles"></div>
+  </div>
+  <div class="card">
+    <h2>🌳 Родословная</h2>
+    <button class="btn sec sm" onclick="addQueenPedigree()">➕ Добавить матку</button>
+    <div id="pedigree-list" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- СЕЗОН -->
+<div class="screen" id="s-season">
+  <div class="info">🌸 <b>Сезонные работы</b>.</div>
+  <div class="card">
+    <h2>🌸 Сезон</h2>
+    <div id="season-tabs"></div>
+    <div class="progress" style="margin-bottom:10px"><div id="season-progress2" style="width:0%"></div></div>
+    <div id="season-list"></div>
+    <button class="btn sec sm" style="margin-top:12px" onclick="addSeasonTask()">➕ Добавить</button>
+  </div>
+</div>
+
+<!-- ПРОДУКЦИЯ -->
+<div class="screen" id="s-honey">
+  <div class="info">📦 <b>Продукция</b>.</div>
+  <div class="card">
+    <h2>📦 Добавить</h2>
+    <label>Тип</label>
+    <select id="p-type"><option>Мёд</option><option>Прополис</option><option>Перга</option><option>Пыльца</option><option>Воск</option><option>Маточное молочко</option><option>Трутневый гомогенат</option></select>
+    <label>Улей</label><select id="p-hive"></select>
+    <label>Количество</label><input type="number" id="p-qty" step="0.1">
+    <label>Единица</label><select id="p-unit"><option>кг</option><option>г</option><option>л</option><option>шт</option></select>
+    <label>Дата</label><input type="date" id="p-date">
+    <label>Заметка</label><input type="text" id="p-note">
+    <button class="btn" onclick="saveProduct()">💾 Добавить (+5 XP)</button>
+  </div>
+  <div class="card">
+    <h2>📦 Склад <span class="cnt" id="products-cnt"></span></h2>
+    <div id="product-list"></div>
+  </div>
+  <button class="btn sec" onclick="go('s-labels')">📄 Этикетка для мёда</button>
+</div>
+
+<!-- ЭТИКЕТКИ -->
+<div class="screen" id="s-labels">
+  <div class="info">📄 <b>Этикетка для мёда</b>.</div>
+  <div class="card">
+    <h2>📄 Параметры</h2>
+    <label>Сорт</label>
+    <select id="lbl-sort">
+      <option>Липовый</option><option>Гречишный</option><option>Акациевый</option>
+      <option>Подсолнечниковый</option><option>Разнотравье</option><option>Луговой</option>
+      <option>Лесной</option><option>Цветочный</option><option>Донниковый</option>
+      <option>Рапсовый</option><option>Каштановый</option><option>Свой вариант</option>
+    </select>
+    <label>Свой сорт</label>
+    <input type="text" id="lbl-sort-custom" placeholder="Например: Борщевик">
+    <label>Вес</label>
+    <select id="lbl-weight">
+      <option>250 г</option><option>500 г</option><option>1 кг</option>
+      <option>1,5 кг</option><option>3 кг</option><option>Другой</option>
+    </select>
+    <label>Свой вес</label><input type="text" id="lbl-weight-custom" placeholder="Например: 700 г">
+    <label>Год</label><input type="number" id="lbl-year">
+    <label>Пасечник / название</label>
+    <input type="text" id="lbl-name" placeholder="Иван Иванов, Пасека «Медовый рай»">
+    <label>Контакты</label>
+    <input type="text" id="lbl-contact" placeholder="+7 900 123-45-67">
+    <button class="btn" onclick="renderLabel()">👁 Обновить превью</button>
+  </div>
+  <div class="card">
+    <h2>👁 Превью</h2>
+    <div class="label-preview" id="label-preview"></div>
+    <button class="btn green" onclick="downloadLabel()">📥 Сохранить как фото</button>
+  </div>
+</div>
+
+<!-- ФИНАНСЫ -->
+<div class="screen" id="s-finance">
+  <div class="info">💰 <b>Финансы</b>.</div>
+  <div class="card">
+    <h2>💵 Баланс</h2>
+    <div class="grid3">
+      <div class="stat"><div class="num" style="color:var(--success)" id="fin-income">0</div><div class="lbl">Доход ₽</div></div>
+      <div class="stat"><div class="num" style="color:var(--danger)" id="fin-expense">0</div><div class="lbl">Расход ₽</div></div>
+      <div class="stat"><div class="num" id="fin-profit">0</div><div class="lbl">Прибыль ₽</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>➕ Добавить операцию</h2>
+    <label>Тип</label><select id="fin-type"><option value="in">💰 Доход</option><option value="out">💸 Расход</option></select>
+    <label>Категория</label>
+    <select id="fin-cat"><option>Мёд</option><option>Прополис</option><option>Перга</option><option>Пыльца</option><option>Воск</option><option>Маточное молочко</option><option>Матки</option><option>Пчёлы</option><option>Опыление</option><option>Корма</option><option>Препараты</option><option>Инвентарь</option><option>Ульи</option><option>Транспорт</option><option>Электричество</option><option>Прочее</option></select>
+    <label>Сумма (₽)</label><input type="number" id="fin-sum" step="1">
+    <label>Дата</label><input type="date" id="fin-date">
+    <label>Комментарий</label><input type="text" id="fin-note">
+    <button class="btn" onclick="saveFinance()">💾 Сохранить (+3 XP)</button>
+  </div>
+  <div class="card">
+    <h2>📊 Топ категорий</h2>
+    <div id="fin-categories"></div>
+  </div>
+  <div class="card">
+    <h2>📋 История</h2>
+    <div id="fin-history"></div>
+  </div>
+</div>
+
+<!-- СПРАВОЧНИК -->
+<div class="screen" id="s-guide">
+  <div class="info">📚 <b>Справочник</b>.</div>
+  <div class="search-bar">
+    <input type="text" id="guide-search" placeholder="Поиск по статьям..." oninput="renderGuide()">
+  </div>
+  <div id="guide-categories"></div>
+</div>
+
+<div class="screen" id="s-guide-article">
+  <div id="guide-article"></div>
+</div>
+
+<!-- ПОИСК -->
+<div class="screen" id="s-search">
+  <div class="info">🔍 <b>Поиск</b> по всему приложению.</div>
+  <div class="search-bar">
+    <input type="text" id="global-search" placeholder="Что искать?" oninput="renderGlobalSearch()">
+  </div>
+  <div class="card">
+    <h2>📋 Результаты <span class="cnt" id="search-cnt"></span></h2>
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<!-- КАЛЕНДАРЬ -->
+<div class="screen" id="s-calendar">
+  <div class="info">📅 <b>Календарь</b>.</div>
+  <div class="card">
+    <h2 id="cal-title">Месяц</h2>
+    <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+      <button class="btn sec sm" style="width:auto;padding:6px 14px;margin:0" onclick="calPrev()">←</button>
+      <button class="btn sec sm" style="width:auto;padding:6px 14px;margin:0" onclick="calToday()">Сегодня</button>
+      <button class="btn sec sm" style="width:auto;padding:6px 14px;margin:0" onclick="calNext()">→</button>
+    </div>
+    <div class="cal-grid" id="cal-head"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+  <div class="card">
+    <h2>📋 События <span class="cnt" id="cal-date-label"></span></h2>
+    <div id="cal-events"></div>
+  </div>
+</div>
+
+<!-- АНАЛИТИКА -->
+<div class="screen" id="s-analytics">
+  <div class="info">📊 <b>Аналитика</b>.</div>
+  <div class="card">
+    <h2>🐝 Средняя сила семей</h2>
+    <div class="chart" id="chart-power"></div>
+  </div>
+  <div class="card">
+    <h2>🍯 Медосбор (кг)</h2>
+    <div class="chart" id="chart-honey"></div>
+  </div>
+  <div class="card">
+    <h2>💰 Финансы</h2>
+    <div class="chart" id="chart-finance"></div>
+    <p style="font-size:11px;color:var(--text-muted);text-align:center;margin:6px 0 0 0">🟩 доход &nbsp; 🟥 расход</p>
+  </div>
+  <div class="card">
+    <h2>🏆 Топ ульев</h2>
+    <div id="top-hives"></div>
+  </div>
+</div>
+
+<!-- НАПОМИНАНИЯ -->
+<div class="screen" id="s-reminders">
+  <div class="info">⏰ <b>Напоминания</b>.</div>
+  <div class="card">
+    <h2>🔔 Активные <span class="cnt" id="rem-cnt"></span></h2>
+    <div id="rem-list"></div>
+  </div>
+  <div class="card">
+    <h2>➕ Добавить</h2>
+    <label>Название</label><input type="text" id="rem-title">
+    <label>Дата</label><input type="date" id="rem-date">
+    <label>Тип</label>
+    <select id="rem-type"><option>📋 Осмотр</option><option>💊 Обработка</option><option>🍯 Подкормка</option><option>👑 Матки</option><option>📦 Продукция</option><option>Другое</option></select>
+    <label>Комментарий</label><input type="text" id="rem-note">
+    <button class="btn" onclick="addReminder()">💾 Добавить (+2 XP)</button>
+  </div>
+</div>
+
+<!-- ДНЕВНИК -->
+<div class="screen" id="s-journal">
+  <div class="info">📆 <b>Дневник</b>.</div>
+  <div class="card">
+    <h2>✏️ Новая запись</h2>
+    <label>Заголовок</label><input type="text" id="j-title">
+    <label>Текст</label><textarea id="j-text" rows="4"></textarea>
+    <label>Дата</label><input type="date" id="j-date">
+    <button class="btn" onclick="saveJournal()">💾 Сохранить (+3 XP)</button>
+  </div>
+  <div class="card">
+    <h2>📖 Записи <span class="cnt" id="journal-cnt"></span></h2>
+    <input type="text" id="journal-search" placeholder="🔍 Поиск..." oninput="renderJournal()">
+    <div id="journal-list"></div>
+  </div>
+</div>
+
+<!-- КАЛЬКУЛЯТОРЫ -->
+<div class="screen" id="s-calc">
+  <div class="info">🧮 <b>Калькуляторы</b>.</div>
+  <div class="card">
+    <h2>🍶 Сироп</h2>
+    <label>Семей</label><input type="number" id="calc-hives" value="1">
+    <label>Литров на семью</label><input type="number" id="calc-liters" value="3">
+    <label>Пропорция</label>
+    <select id="calc-ratio"><option value="1">1:1 (весна)</option><option value="2">2:1 (осень)</option></select>
+    <button class="btn" onclick="calcSyrup()">Рассчитать</button>
+    <div id="calc-syrup-result"></div>
+  </div>
+  <div class="card">
+    <h2>❄️ Корм на зиму</h2>
+    <label>Семей</label><input type="number" id="calc-winter-hives" value="1">
+    <label>Средняя сила</label><input type="number" id="calc-winter-power" value="7">
+    <button class="btn" onclick="calcWinter()">Рассчитать</button>
+    <div id="calc-winter-result"></div>
+  </div>
+  <div class="card">
+    <h2>💊 Препарат</h2>
+    <label>Препарат</label>
+    <select id="calc-drug">
+      <option value="bipin|1|10">Бипин (1 ампула на 10 рамок)</option>
+      <option value="varroa|1|5">Апиварол (1 полоска на 5 рамок)</option>
+      <option value="oxalic|2|1">Щавелевая кислота (2 г на 1 л)</option>
+    </select>
+    <label>Рамок</label><input type="number" id="calc-frames" value="10">
+    <button class="btn" onclick="calcDrug()">Рассчитать</button>
+    <div id="calc-drug-result"></div>
+  </div>
+  <div class="card">
+    <h2>💰 Прибыль</h2>
+    <label>Ульев</label><input type="number" id="calc-profit-hives" value="10">
+    <label>Мёда с улья (кг)</label><input type="number" id="calc-profit-honey" value="30">
+    <label>Цена (₽/кг)</label><input type="number" id="calc-profit-price" value="500">
+    <label>Расходы на улей (₽/год)</label><input type="number" id="calc-profit-costs" value="3000">
+    <button class="btn" onclick="calcProfit()">Рассчитать</button>
+    <div id="calc-profit-result"></div>
+  </div>
+</div>
+
+<!-- ИГРА -->
+<div class="screen" id="s-game">
+  <div class="info">🎮 <b>Игровой режим</b>.</div>
+  <div class="card">
+    <h2>🏆 Челленджи</h2>
+    <div id="challenges-list"></div>
+  </div>
+  <div class="card">
+    <h2>🎯 Квесты</h2>
+    <div id="quests-list"></div>
+  </div>
+  <div class="card">
+    <h2>🏅 Достижения <span class="cnt" id="ach-cnt"></span></h2>
+    <div id="ach-list"></div>
+  </div>
+  <div class="card">
+    <h2>📦 Коллекция</h2>
+    <div id="collection-list"></div>
+  </div>
+</div>
+
+<!-- ЕЩЁ -->
+<div class="screen" id="s-more">
+  <div class="info">☰ <b>Все разделы</b>.</div>
+  <div class="menu-item" onclick="go('s-search')"><div class="mi">🔍</div><div class="mt"><div class="t">Поиск</div><div class="s">По всему приложению</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-queens')"><div class="mi">👑</div><div class="mt"><div class="t">Матководство</div><div class="s">Циклы, родословная</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-honey')"><div class="mi">📦</div><div class="mt"><div class="t">Продукция</div><div class="s">Мёд, прополис, перга</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-labels')"><div class="mi">📄</div><div class="mt"><div class="t">Этикетки</div><div class="s">Для мёда</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-calendar')"><div class="mi">📅</div><div class="mt"><div class="t">Календарь</div><div class="s">Все события</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-analytics')"><div class="mi">📊</div><div class="mt"><div class="t">Аналитика</div><div class="s">Графики</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-reminders')"><div class="mi">⏰</div><div class="mt"><div class="t">Напоминания</div><div class="s">Авто и свои</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-journal')"><div class="mi">📆</div><div class="mt"><div class="t">Дневник</div><div class="s">Записи</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-calc')"><div class="mi">🧮</div><div class="mt"><div class="t">Калькуляторы</div><div class="s">Сироп, корм, препарат, прибыль</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-game')"><div class="mi">🎮</div><div class="mt"><div class="t">Игровой режим</div><div class="s">Челленджи, квесты</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-scheme')"><div class="mi">🗺</div><div class="mt"><div class="t">Схема пасеки</div><div class="s">Карта ульев</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-weather')"><div class="mi">🌦</div><div class="mt"><div class="t">Погода</div><div class="s">Рекомендации</div></div><div style="color:var(--text-muted)">›</div></div>
+  <div class="menu-item" onclick="go('s-settings')"><div class="mi">⚙️</div><div class="mt"><div class="t">Настройки</div><div class="s">Темы, пасеки, экспорт</div></div><div style="color:var(--text-muted)">›</div></div>
+</div>
+
+<!-- ПОГОДА -->
+<div class="screen" id="s-weather">
+  <div class="info">🌦 <b>Погода</b> — введите вручную.</div>
+  <div class="card">
+    <h2>🌦 Текущая погода</h2>
+    <label>Температура (°C)</label><input type="number" id="w-input-temp" value="18">
+    <label>Описание</label>
+    <select id="w-input-desc">
+      <option>☀️ Ясно</option>
+      <option>🌤 Переменная облачность</option>
+      <option>☁️ Облачно</option>
+      <option>🌧 Дождь</option>
+      <option>⛈ Гроза</option>
+      <option>❄️ Снег</option>
+      <option>💨 Ветрено</option>
+    </select>
+    <label>Ветер (м/с)</label><input type="number" id="w-input-wind" value="2">
+    <button class="btn" onclick="saveWeather()">💾 Сохранить</button>
+  </div>
+  <div class="card">
+    <h2>💡 Рекомендации</h2>
+    <div id="w-recommendations"></div>
+  </div>
+</div>
+
+<!-- НАСТРОЙКИ -->
+<div class="screen" id="s-settings">
+  <div class="info">⚙️ <b>Настройки</b>.</div>
+  <div class="card">
+    <h2>🎨 Тема</h2>
+    <div class="theme-picker" id="theme-picker">
+      <div class="theme-opt honey" data-theme="honey" onclick="setTheme('honey')">🍯</div>
+      <div class="theme-opt dark" data-theme="dark" onclick="setTheme('dark')">🌙</div>
+      <div class="theme-opt nature" data-theme="nature" onclick="setTheme('nature')">🌿</div>
+      <div class="theme-opt rose" data-theme="rose" onclick="setTheme('rose')">🌸</div>
+      <div class="theme-opt neon" data-theme="neon" onclick="setTheme('neon')">⚡</div>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin:10px 0 0 0">Выбрано: <b id="theme-name">Медовая</b></p>
+  </div>
+  <div class="card">
+    <h2>🐝 Питомец</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin:0 0 10px 0">Имя питомца</p>
+    <input type="text" id="pet-name-input" placeholder="Улейка">
+    <button class="btn sec sm" onclick="savePetName()">💾 Сохранить имя</button>
+  </div>
+  <div class="card">
+    <h2>⚙️ Пасеки</h2>
+    <div id="apiaries-list"></div>
+    <button class="btn sec sm" style="margin-top:10px" onclick="addApiary()">➕ Добавить пасеку</button>
+  </div>
+  <div class="card">
+    <h2>💾 Данные</h2>
+    <button class="btn sec sm" onclick="exportData()">📤 Экспорт</button>
+    <button class="btn sec sm" style="margin-top:8px" onclick="importData()">📥 Импорт</button>
+    <button class="btn sec sm" style="margin-top:8px;color:var(--danger);border-color:var(--danger)" onclick="resetAll()">🗑 Сброс данных</button>
+  </div>
+  <div class="card">
+    <h2>ℹ️ О приложении</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin:0">Версия 4.1 · Данные хранятся только на вашем iPhone</p>
+  </div>
+</div>
+
+<!-- МОДАЛКА -->
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-content" id="modal-content"></div>
+</div>
+
+<!-- НАВИГАЦИЯ -->
+<nav id="mainNav">
+  <button class="active" data-s="s-home" onclick="go('s-home',this)"><span class="ico">🏠</span>Главная</button>
+  <button data-s="s-hives" onclick="go('s-hives',this)"><span class="ico">🐝</span>Ульи</button>
+  <button data-s="s-season" onclick="go('s-season',this)"><span class="ico">🌸</span>Сезон</button>
+  <button data-s="s-finance" onclick="go('s-finance',this)"><span class="ico">💰</span>Финансы</button>
+  <button data-s="s-guide" onclick="go('s-guide',this)"><span class="ico">📚</span>Справочник</button>
+  <button data-s="s-more" onclick="go('s-more',this)"><span class="ico">☰</span>Ещё</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  /* =====================================================
+   ХРАНИЛИЩЕ
+   ===================================================== */
+const DB = {
+  get(k, d=[]) {
+    try {
+      const v = localStorage.getItem('paseka_'+k);
+      if (v === null || v === undefined) return d;
+      const parsed = JSON.parse(v);
+      return parsed === null || parsed === undefined ? d : parsed;
+    }
+    catch(e) { console.warn('DB.get error:', k, e); return d; }
+  },
+  set(k, v) {
+    try { localStorage.setItem('paseka_'+k, JSON.stringify(v)); return true; }
+    catch(e) {
+      console.warn('DB.set error:', k, e);
+      if (typeof toast === 'function') toast('⚠️ Память заполнена');
+      return false;
+    }
+  }
+};
+
+let CURRENT_HIVE = null;
+let CURRENT_APIARY = DB.get('currentApiary', 1);
+let CURRENT_SEASON = null;
+let CAL_DATE = new Date();
+let CAL_SELECTED = new Date().toISOString().split('T')[0];
+let PLACING_HIVE = null;
+let LEVELUP_SHOWING = false;
+let ACH_SHOWING = false;
+let CH_SHOWING = false;
+
+/* =====================================================
+   ДАТА
+   ===================================================== */
+const todayISO = new Date().toISOString().split('T')[0];
+document.getElementById('today').textContent = new Date().toLocaleDateString('ru-RU', {weekday:'long', day:'numeric', month:'long'});
+['v-date','t-date','f-date','p-date','fin-date','rem-date','j-date'].forEach(id => {
+  const el = document.getElementById(id); if (el) el.value = todayISO;
+});
+
+/* =====================================================
+   ТЕМЫ
+   ===================================================== */
+const THEMES = {
+  honey: { name:'Медовая', pattern:'%23e8d9a8' },
+  dark: { name:'Тёмная', pattern:'%232a2a30' },
+  nature: { name:'Природа', pattern:'%23c8dcc0' },
+  rose: { name:'Розовая', pattern:'%23f5d5e0' },
+  neon: { name:'Неон', pattern:'%231a1a3a' }
+};
+function applyTheme(theme) {
+  if (!THEMES[theme]) theme = 'honey';
+  document.body.className = theme === 'honey' ? '' : 'theme-' + theme;
+  const pattern = THEMES[theme].pattern;
+  document.body.style.backgroundImage = `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='97' viewBox='0 0 56 97'><g fill='none' stroke='${pattern}' stroke-width='1.2'><path d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16 Z'/><path d='M28 64 L56 80 L56 112 M28 64 L0 80 L0 112'/><path d='M28 33 L56 49 M28 33 L0 49' transform='translate(0,31)'/></g></svg>")`;
+  document.querySelectorAll('.theme-opt').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === theme);
+  });
+  const nameEl = document.getElementById('theme-name');
+  if (nameEl) nameEl.textContent = THEMES[theme].name;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  const colors = { honey:'#f6b93b', dark:'#1a1a1f', nature:'#6ab04c', rose:'#e91e63', neon:'#00f5ff' };
+  if (meta) meta.setAttribute('content', colors[theme] || '#f6b93b');
+}
+function setTheme(t) {
+  DB.set('theme', t);
+  applyTheme(t);
+  toast('🎨 Тема: ' + THEMES[t].name);
+  checkAchievements();
+}
+
+/* =====================================================
+   ФАКТЫ ДНЯ
+   ===================================================== */
+const FACTS = [
+  'Матка откладывает до 2000 яиц в сутки в разгар сезона.',
+  'Пчела посещает 100-1500 цветков за один вылет.',
+  'Чтобы собрать 1 кг мёда, пчёлы пролетают около 3 млн км.',
+  'Одна пчела за жизнь производит около 1/12 чайной ложки мёда.',
+  'Мёд не портится — археологи находили съедобный мёд в гробницах 3000-летней давности.',
+  'Пчёлы видят ультрафиолет, но не видят красный цвет.',
+  'В одной семье зимой температура в клубе поддерживается на уровне +25-30°C.',
+  'Пчела машет крыльями до 200 раз в секунду.',
+  'Трутень живёт около 2 месяцев, рабочая пчела — до 45 дней летом.',
+  'В улье может жить до 60 000 пчёл в разгар сезона.',
+  'Пчёлы танцуют, чтобы передать информацию о направлении к медоносам.',
+  'Матка живёт до 5 лет, но лучшая продуктивность — первые 2 года.',
+  'Прополис обладает антибактериальными свойствами и используется в медицине.',
+  'Перга (пчелиный хлеб) содержит в 3 раза больше белка, чем мёд.',
+  'Пчёлы могут распознавать лица людей — эксперименты это подтвердили.',
+  'Воск выделяется молодыми пчёлами из желёз на брюшке.',
+  'Маточное молочко содержит 22 аминокислоты и уникальный белок 10-HDA.',
+  'Пчелиный яд используется в лечении ревматизма и невралгии.',
+  'За один день семья может собрать до 5 кг нектара.',
+  'Пчёлы ориентируются по солнцу даже в облачную погоду — по поляризации света.'
+];
+function getDailyFact() {
+  const day = new Date().getDate() + new Date().getMonth() * 31;
+  return FACTS[day % FACTS.length];
+}
+
+/* =====================================================
+   ПИТОМЕЦ
+   ===================================================== */
+const PET_STAGES = [
+  { min:0, name:'Яйцо', ico:'🥚' },
+  { min:50, name:'Личинка', ico:'🐛' },
+  { min:150, name:'Пчела', ico:'🐝' },
+  { min:400, name:'Сборщица', ico:'🍯' },
+  { min:800, name:'Матка', ico:'👑' },
+  { min:1500, name:'Королева', ico:'👸' }
+];
+function getPetStage(xp) {
+  let stage = PET_STAGES[0];
+  for (const s of PET_STAGES) if (xp >= s.min) stage = s;
+  return stage;
+}
+function getPetName() { return DB.get('petName', 'Улейка'); }
+function savePetName() {
+  const n = document.getElementById('pet-name-input').value.trim() || 'Улейка';
+  DB.set('petName', n);
+  toast('🐝 Имя: ' + n);
+  refreshAll();
+  checkAchievements();
+}
+function getPetAdvice() {
+  const xp = getXP();
+  const hives = DB.get('hives');
+  const season = currentSeason();
+  const weather = DB.get('weather', null);
+  const alerts = hives.map(h => ({ h, health: hiveHealth(h) })).filter(x => x.health.status === 'red');
+  if (alerts.length) return `⚠️ У улья №${alerts[0].h.num} проблема: ${alerts[0].health.reason}. Проверь!`;
+  if (hives.length === 0) return 'Добавь первый улей, и начнём работать!';
+  const visits = DB.get('visits').slice();
+  const lastVisit = visits.length ? visits.sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')))[0] : null;
+  const daysSince = lastVisit ? Math.floor((Date.now() - new Date(lastVisit.date).getTime()) / 86400000) : 999;
+  if (daysSince > 10 && daysSince < 900) return `Давно не осматривали ульи (${daysSince} дн.). Пора проверить!`;
+  if (weather && weather.temp < 10) return 'Холодно. Пчёлы в клубе — не беспокой их.';
+  if (weather && weather.desc && weather.desc.includes('Дождь')) return 'Дождь — не лучший день для осмотра. Отдохни.';
+  if (season === 'Весна') return '🌱 Весна! Не забудь про первую ревизию и подкормку 1:1.';
+  if (season === 'Лето') return '☀️ Лето — следи за роением и ставь магазины.';
+  if (season === 'Осень') return '🍂 Осень — обработка от клеща и сборка гнёзд.';
+  if (season === 'Зима') return '❄️ Зима — контролируй клуб и подкорми канди.';
+  if (xp < 50) return 'Записывай осмотры и продукцию — я буду расти!';
+  return 'Всё в порядке! Продолжай в том же духе 🐝';
+}
+
+/* =====================================================
+   ИГРОВАЯ СИСТЕМА
+   ===================================================== */
+const LEVELS = [
+  { name:'🌱 Новичок', xp:0 },
+  { name:'🐝 Ученик', xp:50 },
+  { name:'🍯 Пчеловод', xp:150 },
+  { name:'🌸 Опытный', xp:350 },
+  { name:'👑 Мастер', xp:700 },
+  { name:'🏆 Мастер-пасечник', xp:1200 },
+  { name:'⭐ Гуру пасеки', xp:2000 }
+];
+function getXP() { return DB.get('xp', 0); }
+function setXP(n) { DB.set('xp', Math.max(0, n)); }
+function addXP(n) {
+  if (!n || n <= 0) return;
+  setXP(getXP() + n);
+  setTimeout(() => {
+    try { checkLevelUp(); } catch(e) { console.warn('levelUp', e); }
+    try { checkAchievements(); } catch(e) { console.warn('ach', e); }
+    try { checkChallenges(); } catch(e) { console.warn('ch', e); }
+  }, 50);
+}
+function getLevel(xp) {
+  let lvl = 0;
+  for (let i = 0; i < LEVELS.length; i++) if (xp >= LEVELS[i].xp) lvl = i;
+  return lvl;
+}
+function checkLevelUp() {
+  const xp = getXP();
+  const lvl = getLevel(xp);
+  const prev = DB.get('level', 0);
+  if (lvl > prev && !LEVELUP_SHOWING) {
+    LEVELUP_SHOWING = true;
+    DB.set('level', lvl);
+    setTimeout(() => {
+      showModal(`<h2>🎉 Новый уровень!</h2>
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:60px">${LEVELS[lvl].name.split(' ')[0]}</div>
+          <div style="font-size:20px;font-weight:700;color:var(--primary-dark);margin-top:10px">${LEVELS[lvl].name}</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:8px">Всего XP: ${xp}</div>
+        </div>
+        <button class="btn" onclick="closeModal();LEVELUP_SHOWING=false">Отлично!</button>`);
+    }, 400);
+  }
+}
+
+const ACHIEVEMENTS = [
+  { id:'first_hive', ico:'🐝', name:'Первое дело', desc:'Первый улей', check:() => DB.get('hives').length >= 1 },
+  { id:'hive5', ico:'🏡', name:'Малая пасека', desc:'5 ульев', check:() => DB.get('hives').length >= 5 },
+  { id:'hive10', ico:'🏘', name:'Большая пасека', desc:'10 ульев', check:() => DB.get('hives').length >= 10 },
+  { id:'visit1', ico:'📋', name:'Первый осмотр', desc:'Записать осмотр', check:() => DB.get('visits').length >= 1 },
+  { id:'visit10', ico:'📝', name:'Внимательный', desc:'10 осмотров', check:() => DB.get('visits').length >= 10 },
+  { id:'visit50', ico:'🎯', name:'Наблюдатель', desc:'50 осмотров', check:() => DB.get('visits').length >= 50 },
+  { id:'honey10', ico:'🍯', name:'Первый мёд', desc:'10 кг мёда', check:() => honeyTotal() >= 10 },
+  { id:'honey100', ico:'🍯', name:'Медовый склад', desc:'100 кг', check:() => honeyTotal() >= 100 },
+  { id:'honey500', ico:'🏆', name:'Магнат', desc:'500 кг', check:() => honeyTotal() >= 500 },
+  { id:'queen', ico:'👑', name:'Мастер маток', desc:'Цикл вывода', check:() => DB.get('queenCycles').length >= 1 },
+  { id:'pedigree', ico:'🌳', name:'Селекционер', desc:'Матка в родословной', check:() => DB.get('pedigree').length >= 1 },
+  { id:'finance1', ico:'💰', name:'Финансист', desc:'Первая операция', check:() => DB.get('finance').length >= 1 },
+  { id:'finance_profit', ico:'💎', name:'В плюсе', desc:'Прибыль 10000₽', check:() => financeProfit() >= 10000 },
+  { id:'season_full', ico:'🌸', name:'Сезон закрыт', desc:'100% сезона', check:() => Object.keys(SEASONS).some(s => seasonProgress(s).pct === 100) },
+  { id:'products3', ico:'📦', name:'Разнообразие', desc:'3 вида продукции', check:() => new Set(DB.get('products').map(p => p.type)).size >= 3 },
+  { id:'treat', ico:'💊', name:'Защитник', desc:'Обработка', check:() => DB.get('treats').length >= 1 },
+  { id:'feed', ico:'🍶', name:'Кормилец', desc:'Первая подкормка', check:() => DB.get('feeds').length >= 1 },
+  { id:'guide', ico:'📚', name:'Теоретик', desc:'5 статей', check:() => DB.get('guideRead', []).length >= 5 },
+  { id:'guide_all', ico:'📖', name:'Энциклопедист', desc:'15 статей', check:() => DB.get('guideRead', []).length >= 15 },
+  { id:'lvl3', ico:'⭐', name:'Опытный', desc:'Ур. 3', check:() => getLevel(getXP()) >= 2 },
+  { id:'lvl5', ico:'🌟', name:'Мастер', desc:'Ур. 5', check:() => getLevel(getXP()) >= 4 },
+  { id:'journal', ico:'📆', name:'Летописец', desc:'5 записей', check:() => DB.get('journal').length >= 5 },
+  { id:'scheme', ico:'🗺', name:'Картограф', desc:'Улей на схеме', check:() => DB.get('hives').some(h => h.x !== undefined) },
+  { id:'reminder', ico:'⏰', name:'Организованный', desc:'Своё напоминание', check:() => DB.get('reminders').length >= 1 },
+  { id:'label', ico:'📄', name:'Упаковщик', desc:'Создал этикетку', check:() => DB.get('labelCreated', false) },
+  { id:'weather', ico:'🌦', name:'Синоптик', desc:'Ввёл погоду', check:() => DB.get('weather', null) !== null },
+  { id:'theme', ico:'🎨', name:'Стилист', desc:'Сменил тему', check:() => DB.get('theme', 'honey') !== 'honey' },
+  { id:'pet_name', ico:'🐝', name:'Друг', desc:'Имя питомцу', check:() => DB.get('petName', 'Улейка') !== 'Улейка' },
+  { id:'challenge1', ico:'🏆', name:'Чемпион', desc:'Выполнил челлендж', check:() => DB.get('challengesDone', []).length >= 1 }
+];
+
+function checkAchievements() {
+  if (ACH_SHOWING) return;
+  const unlocked = DB.get('achievements', []);
+  const newly = [];
+  ACHIEVEMENTS.forEach(a => {
+    if (!unlocked.includes(a.id)) {
+      try { if (a.check()) newly.push(a); } catch(e) { console.warn('ach check', a.id, e); }
+    }
+  });
+  if (newly.length) {
+    ACH_SHOWING = true;
+    newly.forEach(a => unlocked.push(a.id));
+    DB.set('achievements', unlocked);
+    setXP(getXP() + 20 * newly.length);
+    const first = newly[0];
+    setTimeout(() => {
+      showModal(`<h2>🏆 Достижение${newly.length > 1 ? 'я' : ''}!</h2>
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:60px">${first.ico}</div>
+          <div style="font-size:18px;font-weight:700;color:var(--primary-dark);margin-top:10px">${first.name}</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:6px">${first.desc}</div>
+          <div style="font-size:13px;color:var(--success);margin-top:10px;font-weight:600">+${20 * newly.length} XP</div>
+          ${newly.length > 1 ? `<div style="font-size:12px;color:var(--text-muted);margin-top:6px">И ещё ${newly.length - 1}</div>` : ''}
+        </div>
+        <button class="btn" onclick="closeModal();ACH_SHOWING=false">Круто!</button>`);
+    }, 300);
+  }
+}
+
+/* =====================================================
+   ЧЕЛЛЕНДЖИ
+   ===================================================== */
+const CHALLENGES = [
+  { id:'ch_honey_10', ico:'🍯', name:'Первый мёд', desc:'Собрать 10 кг мёда', reward:50, check:() => honeyTotal() >= 10 },
+  { id:'ch_honey_50', ico:'🍯', name:'Медовый сезон', desc:'50 кг мёда за год', reward:100, check:() => honeyTotal() >= 50 },
+  { id:'ch_honey_100', ico:'🍯', name:'Сотня', desc:'100 кг мёда', reward:200, check:() => honeyTotal() >= 100 },
+  { id:'ch_visit_20', ico:'📋', name:'Внимательный', desc:'20 осмотров', reward:80, check:() => DB.get('visits').length >= 20 },
+  { id:'ch_visit_50', ico:'📋', name:'Мастер осмотра', desc:'50 осмотров', reward:150, check:() => DB.get('visits').length >= 50 },
+  { id:'ch_queen_3', ico:'👑', name:'Маточный цех', desc:'3 цикла вывода маток', reward:100, check:() => DB.get('queenCycles').length >= 3 },
+  { id:'ch_products_all', ico:'📦', name:'Максимум', desc:'5 видов продукции', reward:150, check:() => new Set(DB.get('products').map(p => p.type)).size >= 5 },
+  { id:'ch_finance_50k', ico:'💰', name:'Полтинник', desc:'Доход 50 000 ₽', reward:200, check:() => DB.get('finance').filter(f => f.type === 'in').reduce((s,f) => s + f.sum, 0) >= 50000 },
+  { id:'ch_season_spring', ico:'🌸', name:'Весна закрыта', desc:'100% весенних работ', reward:100, check:() => seasonProgress('Весна').pct === 100 },
+  { id:'ch_season_summer', ico:'☀️', name:'Лето закрыто', desc:'100% летних работ', reward:100, check:() => seasonProgress('Лето').pct === 100 },
+  { id:'ch_season_autumn', ico:'🍂', name:'Осень закрыта', desc:'100% осенних работ', reward:100, check:() => seasonProgress('Осень').pct === 100 },
+  { id:'ch_season_winter', ico:'❄️', name:'Зима закрыта', desc:'100% зимних работ', reward:100, check:() => seasonProgress('Зима').pct === 100 }
+];
+function checkChallenges() {
+  if (CH_SHOWING) return;
+  const done = DB.get('challengesDone', []);
+  const newly = [];
+  CHALLENGES.forEach(c => {
+    if (!done.includes(c.id)) {
+      try { if (c.check()) newly.push(c); } catch(e) { console.warn('ch check', c.id, e); }
+    }
+  });
+  if (newly.length) {
+    CH_SHOWING = true;
+    newly.forEach(c => done.push(c.id));
+    DB.set('challengesDone', done);
+    const totalReward = newly.reduce((s, c) => s + c.reward, 0);
+    setXP(getXP() + totalReward);
+    setTimeout(() => {
+      showModal(`<h2>🏆 Челлендж пройден!</h2>
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:60px">${newly[0].ico}</div>
+          <div style="font-size:18px;font-weight:700;color:var(--primary-dark);margin-top:10px">${newly[0].name}</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-top:6px">${newly[0].desc}</div>
+          <div style="font-size:14px;color:var(--success);margin-top:12px;font-weight:700">+${totalReward} XP</div>
+        </div>
+        <button class="btn" onclick="closeModal();CH_SHOWING=false">Продолжить!</button>`);
+    }, 400);
+  }
+}
+
+/* =====================================================
+   СЕЗОНЫ
+   ===================================================== */
+const SEASONS = {
+  'Весна': { months:[3,4,5], tasks:['Выставка ульев из зимовника','Первая весенняя ревизия','Чистка доньев и ульев','Сокращение и утепление гнёзд','Расширение гнёзд сотами','Подкормка сиропом 1:1','Первая обработка от клеща','Постановка пыльцеуловителей','Замена старых маток','Наблюдение за первым облётом'] },
+  'Лето': { months:[6,7,8], tasks:['Постановка магазинов','Контроль роения','Откачка мёда','Вывод маток','Борьба с клещом','Сбор прополиса','Заготовка перги и пыльцы','Объединение слабых семей','Подготовка к главному медосбору','Отбор рамок с маточным молочком'] },
+  'Осень': { months:[9,10,11], tasks:['Наращивание силы','Обработка от клеща','Сборка гнёзд','Замена старых маток','Утепление ульев','Заготовка корма (20-25 кг)','Сокращение летков','Обработка от нозематоза','Осенняя ревизия','Уборка пасеки'] },
+  'Зима': { months:[12,1,2], tasks:['Контроль клуба','Подкормка канди','Защита от мышей','Контроль вентиляции','Ремонт инвентаря','Заготовка рамок','Планирование сезона','Проверка запасов','Отбор проб подмора','Чтение литературы'] }
+};
+function currentSeason() {
+  const m = new Date().getMonth()+1;
+  for (const [name, s] of Object.entries(SEASONS)) if (s.months.includes(m)) return name;
+  return 'Весна';
+}
+function seasonProgress(season) {
+  const done = DB.get('seasonDone_'+season, {});
+  const custom = Object.keys(done).filter(k => k.startsWith('custom_')).map(k => k.replace('custom_',''));
+  const all = [...SEASONS[season].tasks, ...custom];
+  const doneCount = all.filter(t => done[t]).length;
+  return { done: doneCount, total: all.length, pct: all.length ? Math.round(doneCount/all.length*100) : 0 };
+}
+
+/* =====================================================
+   СПРАВОЧНИК
+   ===================================================== */
+const GUIDE = [
+  { ico:'🍶', title:'Сиропы', sub:'Весенний, осенний, лечебный', articles:[
+    { title:'Весенний сироп 1:1', body:`<b>Когда:</b> после первого облёта.<br><br><b>Рецепт:</b><br>• 1 кг сахара<br>• 1 л воды<br>• Лимонная кислота — 1 г на 3 л<br><br><b>Приготовление:</b><br>1. Вскипятить воду.<br>2. Всыпать сахар, размешать.<br>3. Добавить кислоту.<br>4. Остудить до 30-35°C.<br>5. Разлить по 0,5-1 л на семью.<br><br><b>Важно:</b> не варить долго.` },
+    { title:'Осенний сироп 2:1', body:`<b>Когда:</b> конец августа — начало сентября.<br><br><b>Рецепт:</b> 2 кг сахара на 1 л воды.<br><br><b>Цель:</b> довести корм до 20-25 кг.<br><br><b>Важно:</b> закончить за 2-3 недели до холодов.` },
+    { title:'Лечебный сироп', body:`<b>Добавки:</b><br>• Настойка прополиса — 1 ч.л. на 1 л<br>• Уксус яблочный — 1 ст.л. на 1 л<br>• Экстракт хвои<br><br><b>Когда:</b> весной и осенью, курс 3-5 дней.` }
+  ]},
+  { ico:'🍬', title:'Канди', sub:'Зимняя подкормка', articles:[
+    { title:'Канди — рецепт', body:`<b>Рецепт:</b><br>• 1 кг сахарной пудры<br>• 300 г мёда<br>• 50 мл воды<br><br><b>Приготовление:</b><br>1. Мёд разогреть до 40°C.<br>2. Добавить воду.<br>3. Всыпать пудру, вымешать.<br>4. Лепёшка 1-1,5 кг.<br>5. Положить на рамки над клубом.` }
+  ]},
+  { ico:'👑', title:'Вывод маток', sub:'Цикл 21 день', articles:[
+    { title:'Как вывести матку', body:`<b>День 0 — Прививка:</b> личинок в мисочки, в семью-воспитательницу.<br><br><b>День 1-3 — Приём:</b> проверить маточники.<br><br><b>День 6 — Запечатаны.</b><br><br><b>День 11-12 — Выход маток.</b><br><br><b>День 14-16 — Облёт.</b><br><br><b>День 18-21 — Подсадка.</b><br><br><b>Совет:</b> 20-30 маток за цикл.` },
+    { title:'Нуклеус', body:`Маленький улей на 2-4 рамки. Отводок + матка в клеточке. Через 2 недели — яйца.` }
+  ]},
+  { ico:'👑', title:'Маточное молочко', sub:'Сбор', articles:[
+    { title:'Как собирать', body:`<b>Метод:</b><br>1. Привить личинок.<br>2. Через 3 дня собрать шпателем.<br>3. Не касаться металлом.<br><br><b>Хранение:</b> тёмное стекло, +4°C, 5-7 дней; с мёдом — 3 мес.<br><br><b>Кол-во:</b> 20-30 мисочек = 3-5 г.` }
+  ]},
+  { ico:'🌾', title:'Перга и пыльца', sub:'Сбор', articles:[
+    { title:'Пыльца', body:`Пыльцеуловитель на леток, сухая погода, 3-5 дней подряд. Сушка при 40°C. Хранение — тёмная банка, холодильник, 1 год.` },
+    { title:'Перга', body:`Соты после медосбора. В сотах — до 1 года, извлечённая — в мёде в холодильнике. Не замораживать!` }
+  ]},
+  { ico:'🍯', title:'Откачка мёда', sub:'Пошагово', articles:[
+    { title:'Как качать мёд', body:`<b>Когда:</b> соты запечатаны на 2/3.<br><br><b>Шаги:</b><br>1. Снять магазины.<br>2. Удалить пчёл.<br>3. Распечатать соты ножом.<br>4. Медогонка — 2-3 рамки.<br>5. Фильтрация.<br>6. Отстоять 2-3 дня.<br><br><b>Хранение:</b> +10-15°C, тёмное место, 2+ года.` }
+  ]},
+  { ico:'💊', title:'Обработка от клеща', sub:'Методы', articles:[
+    { title:'Методы борьбы с варроа', body:`<b>Бипин/Апиварол:</b> 1 полоска на 5-10 рамок, 5-7 дней.<br><br><b>Щавелевая:</b> 2 г на 1 л, 3-4 раза.<br><br><b>Муравьиная:</b> 20-30 мл, +15-25°C.<br><br><b>Сроки:</b> весна (апрель-май), осень (сентябрь-октябрь).` }
+  ]},
+  { ico:'❄️', title:'Зимовка', sub:'Подготовка', articles:[
+    { title:'Как подготовить', body:`<b>Корм:</b> 20-25 кг мёда.<br><b>Гнездо:</b> собрать, утеплить.<br><b>Летки:</b> 1-2 см.<br><b>Матки:</b> заменить старше 2 лет.<br><b>Условия:</b> +2...+5°C, влажность 75-85%.` }
+  ]},
+  { ico:'🌧', title:'Роение', sub:'Профилактика', articles:[
+    { title:'Как предотвратить', body:`<b>Причины:</b> теснота, старая матка, жара.<br><br><b>Профилактика:</b><br>1. Расширение раз в 7-10 дней.<br>2. Замена маток.<br>3. Магазины заранее.<br>4. Отводки.<br>5. Вентиляция.` }
+  ]},
+  { ico:'🍯', title:'Прополис', sub:'Сбор', articles:[
+    { title:'Как собирать', body:`<b>Способы:</b><br>1. Скребком.<br>2. Сетка-прополисоловка.<br>3. Натирание.<br><br><b>Отделение от воска:</b> холодная вода.<br><br><b>Настойка:</b> 10 г на 100 мл спирта 70%, 2 недели.` }
+  ]},
+  { ico:'🐝', title:'Работа с пчёлами', sub:'Основы', articles:[
+    { title:'Осмотр улья', body:`<b>Время:</b> тёплый день (от +14°C), без ветра.<br><br><b>Порядок:</b><br>1. Дымарь.<br>2. Снять крышку.<br>3. Рамки медленно.<br>4. Осмотреть.<br>5. Собрать.<br><br><b>Важно:</b> не держать открытым >20 мин.` }
+  ]},
+  { ico:'🦠', title:'Болезни пчёл', sub:'Признаки', articles:[
+    { title:'Гнилец', body:`<b>Признаки:</b> запах гнили, тёмные вязкие личинки, вдавленные крышечки.<br><br><b>Действия:</b><br>1. Изолировать улей.<br>2. Сжечь поражённые рамки.<br>3. Апитокс, Окситетрациклин.<br>4. Заменить матку.<br>5. Дезинфекция.` },
+    { title:'Аскосфероз', body:`Белые/серые "мумии" личинок. Причины: сырость. Лечение: вентиляция, замена матки, Аскосан.` },
+    { title:'Варроатоз', body:`Клещи на пчёлах, деформация крыльев. Лечение — обработки.` },
+    { title:'Нозематоз', body:`Понос, слабость, гибель зимой. Лечение: Ноземат, Фумагиллин, замена матки, дезинфекция.` }
+  ]},
+  { ico:'💊', title:'Препараты', sub:'Дозировки', articles:[
+    { title:'Противоварроатозные', body:`<b>Бипин-Т:</b> 1 ампула на 10 рамок, 2 обработки через 7 дней.<br><br><b>Апиварол:</b> 1 полоска на 5 рамок, 5-7 дней, курс 2 раза.<br><br><b>Тактик:</b> 1 ампула на 10 рамок.<br><br><b>Щавелевая:</b> 2 г на 1 л.<br><br><b>Муравьиная:</b> 20-30 мл.<br><br><b>Срок ожидания:</b> 2+ недели до откачки.` }
+  ]}
+];
+
+/* =====================================================
+   НАВИГАЦИЯ
+   ===================================================== */
+const HISTORY = [];
+const NO_NAV = ['s-hive','s-visit','s-treat','s-feed','s-guide-article','s-scheme','s-weather'];
+function go(id, btn) {
+  const cur = document.querySelector('.screen.active');
+  if (cur && cur.id !== id) HISTORY.push(cur.id);
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById(id);
+  if (screen) screen.classList.add('active');
+  document.getElementById('mainNav').style.display = NO_NAV.includes(id) ? 'none' : 'flex';
+  document.getElementById('backBtn').style.display = NO_NAV.includes(id) ? 'block' : 'none';
+  const titles = {
+    's-home':'🐝 Пасека', 's-hives':'🐝 Ульи', 's-hive':'🐝 Улей', 's-scheme':'🗺 Схема',
+    's-visit':'📋 Осмотр', 's-treat':'💊 Обработка', 's-feed':'🍯 Подкормка',
+    's-queens':'👑 Матки', 's-season':'🌸 Сезон', 's-honey':'📦 Продукция',
+    's-labels':'📄 Этикетки', 's-finance':'💰 Финансы', 's-guide':'📚 Справочник',
+    's-guide-article':'📖 Статья', 's-calendar':'📅 Календарь', 's-analytics':'📊 Аналитика',
+    's-reminders':'⏰ Напоминания', 's-journal':'📆 Дневник', 's-calc':'🧮 Калькуляторы',
+    's-game':'🎮 Игровой режим', 's-more':'☰ Ещё', 's-settings':'⚙️ Настройки',
+    's-weather':'🌦 Погода', 's-search':'🔍 Поиск'
+  };
+  document.getElementById('pageTitle').textContent = titles[id] || 'Пасека';
+  if (btn) {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  } else {
+    document.querySelectorAll('nav button').forEach(b => {
+      b.classList.toggle('active', b.dataset.s === id);
+    });
+  }
+  window.scrollTo(0,0);
+  refreshAll();
+}
+function goBack() {
+  const prev = HISTORY.pop() || 's-home';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById(prev);
+  if (screen) screen.classList.add('active');
+  document.getElementById('mainNav').style.display = NO_NAV.includes(prev) ? 'none' : 'flex';
+  document.getElementById('backBtn').style.display = NO_NAV.includes(prev) ? 'block' : 'none';
+  refreshAll();
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function showModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+/* =====================================================
+   ПОГОДА
+   ===================================================== */
+function saveWeather() {
+  const w = {
+    temp: +document.getElementById('w-input-temp').value,
+    desc: document.getElementById('w-input-desc').value,
+    wind: +document.getElementById('w-input-wind').value,
+    date: todayISO
+  };
+  DB.set('weather', w);
+  addXP(2);
+  toast('🌦 Погода обновлена');
+  refreshAll();
+  checkAchievements();
+}
+function weatherEmoji(desc) {
+  if (!desc) return '🌤';
+  if (desc.includes('Ясно')) return '☀️';
+  if (desc.includes('Переменная')) return '🌤';
+  if (desc.includes('Облачно')) return '☁️';
+  if (desc.includes('Дождь')) return '🌧';
+  if (desc.includes('Гроза')) return '⛈';
+  if (desc.includes('Снег')) return '❄️';
+  if (desc.includes('Ветрено')) return '💨';
+  return '🌤';
+}
+function weatherAdvice(w) {
+  if (!w) return 'Введите погоду, чтобы получить рекомендации';
+  const t = w.temp, d = w.desc || '', wind = w.wind || 0;
+  const lines = [];
+  if (t < 10) lines.push('❄️ Холодно — пчёлы в клубе, не беспокой.');
+  else if (t < 14) lines.push('🌥 Прохладно — осмотр только при необходимости.');
+  else if (t > 35) lines.push('🔥 Жарко — осматривать рано утром или вечером.');
+  else lines.push('✅ Хорошая температура для осмотра.');
+  if (d.includes('Дождь') || d.includes('Гроза')) lines.push('🌧 Дождь — не открывай улей.');
+  if (d.includes('Ясно') && t > 18 && t < 30) lines.push('☀️ Отличный день для осмотра!');
+  if (wind > 7) lines.push('💨 Сильный ветер — пчёлы агрессивны.');
+  else if (wind > 4) lines.push('🍃 Ветрено — работай аккуратно.');
+  return lines.join('<br>');
+}
+function weatherClass(desc) {
+  if (!desc) return '';
+  if (desc.includes('Ясно')) return 'sun';
+  if (desc.includes('Дождь') || desc.includes('Гроза')) return 'rain';
+  if (desc.includes('Облачно') || desc.includes('Переменная')) return 'cloud';
+  return '';
+}
+
+/* =====================================================
+   ЭТИКЕТКИ
+   ===================================================== */
+function renderLabel() {
+  const sortSel = document.getElementById('lbl-sort')?.value || 'Липовый';
+  const sort = sortSel === 'Свой вариант'
+    ? (document.getElementById('lbl-sort-custom').value || 'Свой сорт')
+    : sortSel;
+  const weightSel = document.getElementById('lbl-weight')?.value || '500 г';
+  const weight = weightSel === 'Другой'
+    ? (document.getElementById('lbl-weight-custom').value || '—')
+    : weightSel;
+  const yearVal = document.getElementById('lbl-year')?.value;
+  const year = yearVal || new Date().getFullYear();
+  const name = document.getElementById('lbl-name')?.value || 'Пасека';
+  const contact = document.getElementById('lbl-contact')?.value || '';
+  const preview = document.getElementById('label-preview');
+  if (!preview) return;
+  preview.innerHTML = `
+    <div class="label-honey">Натуральный мёд</div>
+    <div class="label-sort">${sort}</div>
+    <div class="label-weight">${weight}</div>
+    <div class="label-year">${year}</div>
+    <div class="label-beekeeper">${name}${contact ? '<br>' + contact : ''}</div>
+  `;
+}
+function downloadLabel() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 600; canvas.height = 400;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 600, 400);
+  grad.addColorStop(0, '#fff9e6');
+  grad.addColorStop(1, '#ffe58a');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 600, 400);
+  ctx.strokeStyle = '#e58e26';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(20, 20, 560, 360);
+  ctx.strokeStyle = '#f6b93b';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(30, 30, 540, 340);
+  ctx.fillStyle = '#8a7030';
+  ctx.font = 'bold 20px -apple-system, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('НАТУРАЛЬНЫЙ МЁД', 300, 90);
+  ctx.fillStyle = '#3a2a10';
+  ctx.font = 'bold 42px -apple-system, sans-serif';
+  const sortSel = document.getElementById('lbl-sort').value;
+  ctx.fillText(sortSel === 'Свой вариант'
+    ? (document.getElementById('lbl-sort-custom').value || 'Свой сорт')
+    : sortSel, 300, 170);
+  ctx.fillStyle = '#5a4a20';
+  ctx.font = '28px -apple-system, sans-serif';
+  const wSel = document.getElementById('lbl-weight').value;
+  ctx.fillText(wSel === 'Другой'
+    ? (document.getElementById('lbl-weight-custom').value || '')
+    : wSel, 300, 230);
+  ctx.fillStyle = '#8a7030';
+  ctx.font = '20px -apple-system, sans-serif';
+  ctx.fillText(document.getElementById('lbl-year').value, 300, 275);
+  ctx.font = 'italic 16px -apple-system, sans-serif';
+  ctx.fillText(document.getElementById('lbl-name').value || '', 300, 320);
+  const contact = document.getElementById('lbl-contact').value;
+  if (contact) {
+    ctx.font = '14px -apple-system, sans-serif';
+    ctx.fillText(contact, 300, 345);
+  }
+  canvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'med_etiketka.png';
+    a.click();
+    DB.set('labelCreated', true);
+    toast('📥 Этикетка сохранена');
+    checkAchievements();
+  }, 'image/png');
+}
+
+/* =====================================================
+   УЛЬИ
+   ===================================================== */
+function addHive() {
+  const n = prompt('Номер улья:');
+  if (!n) return;
+  const hives = DB.get('hives');
+  hives.push({ id: Date.now(), num: n, power: 5, queen: 'не указана', type: 'Дадан',
+    queenYear: new Date().getFullYear(), queenBreed: 'Карпатка', apiary: CURRENT_APIARY });
+  if (DB.set('hives', hives)) { addXP(5); toast('✅ Улей добавлен'); refreshAll(); }
+}
+function deleteHive() {
+  if (!CURRENT_HIVE) return;
+  if (!confirm('Удалить улей №' + CURRENT_HIVE.num + '?')) return;
+  DB.set('hives', DB.get('hives').filter(h => h.id !== CURRENT_HIVE.id));
+  CURRENT_HIVE = null; goBack(); toast('Улей удалён');
+}
+function editHive() {
+  if (!CURRENT_HIVE) return;
+  const hives = DB.get('hives');
+  const h = hives.find(x => x.id === CURRENT_HIVE.id);
+  if (!h) return;
+  h.num = prompt('Номер:', h.num) || h.num;
+  h.type = prompt('Тип улья:', h.type) || h.type;
+  h.power = +prompt('Сила (1-10):', h.power) || h.power;
+  h.queen = prompt('Матка:', h.queen) || h.queen;
+  h.queenYear = +prompt('Год матки:', h.queenYear) || h.queenYear;
+  h.queenBreed = prompt('Порода:', h.queenBreed) || h.queenBreed;
+  DB.set('hives', hives); CURRENT_HIVE = h;
+  openHive(h.id); toast('Обновлено');
+}
+function hiveHealth(h) {
+  const visits = DB.get('visits').filter(v => v.hive == h.num);
+  if (!visits.length) return { status:'yellow', reason:'Нет данных об осмотре' };
+  let lastVisit;
+  try {
+    lastVisit = visits.slice().sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')))[0];
+  } catch(e) { lastVisit = visits[visits.length - 1]; }
+  if (!lastVisit) return { status:'yellow', reason:'Нет данных об осмотре' };
+  const dateObj = new Date(lastVisit.date);
+  const days = isNaN(dateObj.getTime()) ? 999 : Math.floor((Date.now() - dateObj.getTime()) / 86400000);
+  if (lastVisit.queen === 'Нет') return { status:'red', reason:'Нет матки' };
+  if ((lastVisit.power || 0) <= 3) return { status:'red', reason:'Слабая семья' };
+  if ((lastVisit.food || 0) < 3) return { status:'red', reason:'Мало корма (<3 кг)' };
+  if (days > 21) return { status:'red', reason:`Осмотр был ${days} дн. назад!` };
+  if (days > 14) return { status:'yellow', reason:`Осмотр был ${days} дн. назад` };
+  if ((lastVisit.power || 0) <= 5) return { status:'yellow', reason:'Средняя сила семьи' };
+  if ((lastVisit.food || 0) < 5) return { status:'yellow', reason:'Корм меньше 5 кг' };
+  return { status:'green', reason:'Всё в норме' };
+}
+
+/* =====================================================
+   СХЕМА
+   ===================================================== */
+function renderScheme() {
+  const hives = DB.get('hives').filter(h => !h.apiary || h.apiary === CURRENT_APIARY);
+  const area = document.getElementById('scheme-area');
+  if (!area) return;
+  area.innerHTML = '';
+  hives.filter(h => h.x !== undefined).forEach(h => {
+    const health = hiveHealth(h);
+    const pin = document.createElement('div');
+    pin.className = 'hive-pin ' + health.status;
+    pin.style.left = h.x + '%';
+    pin.style.top = h.y + '%';
+    pin.innerHTML = `<div class="n">${h.num}</div>`;
+    pin.title = health.reason;
+    pin.onclick = e => { e.stopPropagation(); openHive(h.id); };
+    pin.ondblclick = e => {
+      e.stopPropagation();
+      if (confirm('Убрать улей со схемы?')) {
+        const all = DB.get('hives');
+        const hh = all.find(x => x.id === h.id);
+        if (hh) { hh.x = undefined; hh.y = undefined; DB.set('hives', all); renderScheme(); }
+      }
+    };
+    area.appendChild(pin);
+  });
+  const unplaced = hives.filter(h => h.x === undefined);
+  const el = document.getElementById('unplaced-list');
+  if (el) {
+    el.innerHTML = unplaced.length ? unplaced.map(h =>
+      `<div class="row clickable" onclick="placeHive(${h.id})">
+        <span>Улей №${h.num}</span><span style="color:var(--text-muted);font-size:12px">${PLACING_HIVE === h.id ? '▶ тапните по полю' : 'тап → разместить'}</span>
+      </div>`).join('') : '<div class="empty">Все ульи на схеме</div>';
+  }
+  const hint = document.getElementById('scheme-hint');
+  if (hint) hint.textContent = PLACING_HIVE ? 'Тапните по полю' : 'Выберите улей';
+}
+function placeHive(id) {
+  PLACING_HIVE = id;
+  toast('Тапните по схеме');
+  renderScheme();
+}
+function schemeClick(e) {
+  if (!PLACING_HIVE) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const x = Math.max(5, Math.min(95, ((e.clientX - rect.left) / rect.width) * 100));
+  const y = Math.max(5, Math.min(95, ((e.clientY - rect.top) / rect.height) * 100));
+  const hives = DB.get('hives');
+  const h = hives.find(x => x.id === PLACING_HIVE);
+  if (h) { h.x = x; h.y = y; DB.set('hives', hives); }
+  PLACING_HIVE = null;
+  addXP(5); renderScheme(); refreshAll();
+}
+
+/* =====================================================
+   ФОРМЫ
+   ===================================================== */
+function openVisitForm() { fillHiveSelects(); go('s-visit'); }
+async function saveVisit() {
+  const v = {
+    id: Date.now(),
+    hive: document.getElementById('v-hive').value,
+    date: document.getElementById('v-date').value,
+    power: +document.getElementById('v-power').value,
+    queen: document.getElementById('v-queen').value,
+    brood: document.getElementById('v-brood').value,
+    food: +document.getElementById('v-food').value,
+    behavior: document.getElementById('v-behavior').value,
+    note: document.getElementById('v-note').value,
+    photo: null
+  };
+  if (!v.hive) return toast('Выберите улей');
+  const file = document.getElementById('v-photo').files[0];
+  if (file) {
+    try { v.photo = await fileToDataURL(file); }
+    catch(e) { toast('Не удалось загрузить фото'); }
+  }
+  DB.set('visits', [...DB.get('visits'), v]);
+  const hives = DB.get('hives');
+  const h = hives.find(x => x.num == v.hive);
+  if (h) { h.power = v.power; h.queen = v.queen; DB.set('hives', hives); }
+  document.getElementById('v-note').value = '';
+  document.getElementById('v-photo').value = '';
+  addXP(5); toast('✅ Осмотр сохранён (+5 XP)'); goBack();
+}
+function fileToDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onerror = rej;
+    r.onload = e => {
+      const img = new Image();
+      img.onerror = rej;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale = Math.min(1, 600 / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        res(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+function openTreatForm() { fillHiveSelects(); go('s-treat'); }
+function saveTreat() {
+  const t = {
+    id: Date.now(), hive: document.getElementById('t-hive').value,
+    date: document.getElementById('t-date').value,
+    drug: document.getElementById('t-drug').value,
+    against: document.getElementById('t-against').value,
+    dose: document.getElementById('t-dose').value,
+    repeat: +document.getElementById('t-repeat').value,
+    note: document.getElementById('t-note').value
+  };
+  if (!t.hive || !t.drug) return toast('Заполните поля');
+  DB.set('treats', [...DB.get('treats'), t]);
+  if (t.repeat > 0) {
+    const d = new Date(t.date); d.setDate(d.getDate() + t.repeat);
+    DB.set('reminders', [...DB.get('reminders'), {
+      id: Date.now(), title: `Повтор: ${t.drug}`,
+      date: d.toISOString().split('T')[0], type: '💊 Обработка',
+      note: `Улей №${t.hive}`, done: false
+    }]);
+  }
+  document.getElementById('t-drug').value = '';
+  addXP(5); toast('💊 Сохранено'); goBack();
+}
+function openFeedForm() { fillHiveSelects(); go('s-feed'); }
+function saveFeed() {
+  const f = {
+    id: Date.now(), hive: document.getElementById('f-hive').value,
+    date: document.getElementById('f-date').value,
+    type: document.getElementById('f-type').value,
+    qty: +document.getElementById('f-qty').value,
+    note: document.getElementById('f-note').value
+  };
+  if (!f.hive) return toast('Выберите улей');
+  DB.set('feeds', [...DB.get('feeds'), f]);
+  document.getElementById('f-note').value = '';
+  addXP(3);
+  toast('🍯 Сохранено (+3 XP)');
+  goBack();
+}
+function openProductForm() { fillHiveSelects(); go('s-honey'); }
+function saveProduct() {
+  const p = {
+    id: Date.now(), type: document.getElementById('p-type').value,
+    hive: document.getElementById('p-hive').value,
+    qty: +document.getElementById('p-qty').value,
+    unit: document.getElementById('p-unit').value,
+    date: document.getElementById('p-date').value,
+    note: document.getElementById('p-note').value
+  };
+  if (!p.qty) return toast('Укажите количество');
+  DB.set('products', [...DB.get('products'), p]);
+  document.getElementById('p-qty').value = '';
+  document.getElementById('p-note').value = '';
+  addXP(5); refreshAll(); toast('📦 Добавлено (+5 XP)');
+}
+function saveFinance() {
+  const f = {
+    id: Date.now(), type: document.getElementById('fin-type').value,
+    cat: document.getElementById('fin-cat').value,
+    sum: +document.getElementById('fin-sum').value,
+    date: document.getElementById('fin-date').value,
+    note: document.getElementById('fin-note').value
+  };
+  if (!f.sum) return toast('Укажите сумму');
+  DB.set('finance', [...DB.get('finance'), f]);
+  document.getElementById('fin-sum').value = '';
+  document.getElementById('fin-note').value = '';
+  addXP(3); refreshAll(); toast('💰 Сохранено');
+}
+function startQueenCycle() {
+  const start = prompt('Дата прививки (ГГГГ-ММ-ДД):', todayISO);
+  if (!start) return;
+  DB.set('queenCycles', [...DB.get('queenCycles'), { id: Date.now(), start }]);
+  addXP(10); refreshAll(); toast('👑 Цикл запущен (+10 XP)');
+}
+function addQueenPedigree() {
+  const name = prompt('Имя матки:'); if (!name) return;
+  const mother = prompt('Мать:', '') || '';
+  const year = +prompt('Год:', new Date().getFullYear()) || new Date().getFullYear();
+  const breed = prompt('Порода:', 'Карпатка') || 'Карпатка';
+  const note = prompt('Заметка:', '') || '';
+  DB.set('pedigree', [...DB.get('pedigree'), { id: Date.now(), name, mother, year, breed, note }]);
+  addXP(10); refreshAll(); toast('🌳 Добавлено');
+}
+function toggleSeasonTask(task) {
+  const done = DB.get('seasonDone_'+CURRENT_SEASON, {});
+  done[task] = !done[task];
+  DB.set('seasonDone_'+CURRENT_SEASON, done);
+  if (done[task]) addXP(2);
+  refreshAll();
+}
+function addSeasonTask() {
+  const t = prompt('Название работы:'); if (!t) return;
+  const done = DB.get('seasonDone_'+CURRENT_SEASON, {});
+  done['custom_'+t] = false;
+  DB.set('seasonDone_'+CURRENT_SEASON, done);
+  refreshAll();
+}
+function addApiary() {
+  const name = prompt('Название:'); if (!name) return;
+  const list = DB.get('apiaries', [{ id: 1, name: 'Основная' }]);
+  list.push({ id: Date.now(), name });
+  DB.set('apiaries', list); refreshAll(); toast('📍 Добавлено');
+}
+function switchApiary(id) { CURRENT_APIARY = id; DB.set('currentApiary', id); refreshAll(); }
+function addReminder() {
+  const title = document.getElementById('rem-title').value;
+  if (!title) return toast('Введите название');
+  const r = {
+    id: Date.now(), title,
+    date: document.getElementById('rem-date').value,
+    type: document.getElementById('rem-type').value,
+    note: document.getElementById('rem-note').value,
+    done: false
+  };
+  DB.set('reminders', [...DB.get('reminders'), r]);
+  document.getElementById('rem-title').value = '';
+  document.getElementById('rem-note').value = '';
+  addXP(2); refreshAll(); toast('⏰ Добавлено');
+}
+function getAutoReminders() {
+  const list = [];
+  const hives = DB.get('hives').filter(h => !h.apiary || h.apiary === CURRENT_APIARY);
+  hives.forEach(h => {
+    const visits = DB.get('visits').filter(v => v.hive == h.num);
+    let lastVisit = null;
+    if (visits.length) {
+      try { lastVisit = visits.slice().sort((a,b) => String(b.date || '').localeCompare(String(a.date || '')))[0]; }
+      catch(e) { lastVisit = visits[visits.length - 1]; }
+    }
+    const lastDate = lastVisit ? new Date(lastVisit.date) : null;
+    const next = lastDate && !isNaN(lastDate.getTime()) ? new Date(lastDate.getTime() + 10*86400000) : new Date();
+    const days = Math.floor((next - Date.now()) / 86400000);
+    list.push({ date: next.toISOString().split('T')[0], title: `📋 Осмотр улья №${h.num}`, days, type:'visit' });
+  });
+  DB.get('queenCycles').forEach(c => {
+    const stages = [['Проверка приёма', 3], ['Маточники', 6], ['Выход маток', 12], ['Облёт', 16], ['Подсадка', 21]];
+    stages.forEach(([n, d]) => {
+      const date = new Date(c.start); date.setDate(date.getDate() + d);
+      const days = Math.floor((date - Date.now()) / 86400000);
+      if (days >= -2 && days <= 30) {
+        list.push({ date: date.toISOString().split('T')[0], title: `👑 ${n} (от ${c.start})`, days, type:'queen' });
+      }
+    });
+  });
+  return list.sort((a, b) => a.days - b.days);
+}
+function toggleReminder(id) {
+  const list = DB.get('reminders');
+  const r = list.find(x => x.id === id);
+  if (r) { r.done = !r.done; DB.set('reminders', list); refreshAll(); }
+}
+function saveJournal() {
+  const j = {
+    id: Date.now(),
+    title: document.getElementById('j-title').value || 'Запись',
+    text: document.getElementById('j-text').value,
+    date: document.getElementById('j-date').value
+  };
+  if (!j.text) return toast('Введите текст');
+  DB.set('journal', [...DB.get('journal'), j]);
+  document.getElementById('j-title').value = '';
+  document.getElementById('j-text').value = '';
+  addXP(3); refreshAll(); toast('📆 Сохранено (+3 XP)');
+}
+function deleteJournal(id) {
+  if (!confirm('Удалить запись?')) return;
+  DB.set('journal', DB.get('journal').filter(x => x.id !== id));
+  refreshAll();
+}
+
+/* =====================================================
+   КАЛЬКУЛЯТОРЫ
+   ===================================================== */
+function markCalcUsed() { DB.set('calcUsed', true); }
+function calcSyrup() {
+  const hives = +document.getElementById('calc-hives').value;
+  const liters = +document.getElementById('calc-liters').value;
+  const ratio = +document.getElementById('calc-ratio').value;
+  const totalLiters = hives * liters;
+  const sugar = ratio === 1 ? totalLiters * 0.5 : totalLiters * 0.667;
+  const water = totalLiters - sugar;
+  document.getElementById('calc-syrup-result').innerHTML = `
+    <div class="calc-result">
+      <div class="num">${sugar.toFixed(1)} кг</div>
+      <div class="lbl">сахара</div>
+      <div style="margin-top:10px" class="num">${water.toFixed(1)} л</div>
+      <div class="lbl">воды</div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:10px">Сироп: ${totalLiters.toFixed(1)} л</div>
+    </div>`;
+  markCalcUsed();
+}
+function calcWinter() {
+  const hives = +document.getElementById('calc-winter-hives').value;
+  const power = +document.getElementById('calc-winter-power').value;
+  const perHive = power * 2 + 5;
+  const total = perHive * hives;
+  document.getElementById('calc-winter-result').innerHTML = `
+    <div class="calc-result">
+      <div class="num">${perHive} кг</div>
+      <div class="lbl">на семью</div>
+      <div style="margin-top:10px" class="num">${total} кг</div>
+      <div class="lbl">всего на ${hives}</div>
+    </div>`;
+  markCalcUsed();
+}
+function calcDrug() {
+  const [name, amount, frames] = document.getElementById('calc-drug').value.split('|');
+  const userFrames = +document.getElementById('calc-frames').value;
+  const need = (userFrames / +frames) * +amount;
+  const names = { bipin:'Бипин (ампул)', varroa:'Апиварол (полосок)', oxalic:'Щавелевая (г)' };
+  document.getElementById('calc-drug-result').innerHTML = `
+    <div class="calc-result">
+      <div class="num">${need.toFixed(2)}</div>
+      <div class="lbl">${names[name]} на ${userFrames} рамок</div>
+    </div>`;
+  markCalcUsed();
+}
+function calcProfit() {
+  const hives = +document.getElementById('calc-profit-hives').value;
+  const honey = +document.getElementById('calc-profit-honey').value;
+  const price = +document.getElementById('calc-profit-price').value;
+  const costs = +document.getElementById('calc-profit-costs').value;
+  const income = hives * honey * price;
+  const totalCosts = hives * costs;
+  const profit = income - totalCosts;
+  document.getElementById('calc-profit-result').innerHTML = `
+    <div class="calc-result">
+      <div class="num" style="color:var(--success)">${income.toLocaleString('ru-RU')} ₽</div>
+      <div class="lbl">доход</div>
+      <div style="margin-top:8px" class="num">−${totalCosts.toLocaleString('ru-RU')} ₽</div>
+      <div class="lbl">расход</div>
+      <div style="margin-top:10px" class="num" style="color:${profit>=0?'var(--success)':'var(--danger)'}">${profit.toLocaleString('ru-RU')} ₽</div>
+      <div class="lbl">прибыль</div>
+    </div>`;
+  markCalcUsed();
+}
+
+/* =====================================================
+   КАЛЕНДАРЬ
+   ===================================================== */
+function renderCalendar() {
+  const year = CAL_DATE.getFullYear();
+  const month = CAL_DATE.getMonth();
+  const monthNames = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  document.getElementById('cal-title').textContent = `${monthNames[month]} ${year}`;
+  document.getElementById('cal-head').innerHTML = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс']
+    .map(d => `<div style="text-align:center;font-size:11px;color:var(--text-muted);font-weight:600">${d}</div>`).join('');
+  const first = new Date(year, month, 1);
+  const startDay = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevDays = new Date(year, month, 0).getDate();
+  let html = '';
+  for (let i = startDay - 1; i >= 0; i--) html += `<div class="cal-day other">${prevDays - i}</div>`;
+  const events = getAllEvents();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayEvents = events.filter(e => e.date === dateStr);
+    const isToday = dateStr === todayISO;
+    const isSel = dateStr === CAL_SELECTED;
+    html += `<div class="cal-day ${isToday?'today':''} ${isSel && !isToday ? 'sel' : ''}" onclick="selectCalDay('${dateStr}')">
+      ${d}
+      <div class="dots">${dayEvents.slice(0,3).map(e => `<div class="dot" style="background:${e.color}"></div>`).join('')}</div>
+    </div>`;
+  }
+  document.getElementById('cal-grid').innerHTML = html;
+  const sel = events.filter(e => e.date === CAL_SELECTED);
+  document.getElementById('cal-date-label').textContent = CAL_SELECTED;
+  document.getElementById('cal-events').innerHTML = sel.length ? sel.map(e =>
+    `<div class="row"><span>${e.ico} ${e.title}</span></div>`
+  ).join('') : '<div class="empty">Нет событий</div>';
+}
+function getAllEvents() {
+  const ev = [];
+  DB.get('visits').forEach(v => ev.push({ date: v.date, ico:'📋', title:`Осмотр улья №${v.hive}`, color:'#f6b93b' }));
+  DB.get('treats').forEach(t => ev.push({ date: t.date, ico:'💊', title:`${t.drug} (№${t.hive})`, color:'#e74c3c' }));
+  DB.get('feeds').forEach(f => ev.push({ date: f.date, ico:'🍯', title:`${f.type} (№${f.hive})`, color:'#f39c12' }));
+  DB.get('products').forEach(p => ev.push({ date: p.date, ico:'📦', title:`${p.type} ${p.qty}${p.unit}`, color:'#27ae60' }));
+  DB.get('finance').forEach(f => ev.push({ date: f.date, ico: f.type === 'in' ? '💰' : '💸', title:`${f.cat}: ${f.sum}₽`, color: f.type === 'in' ? '#27ae60' : '#e74c3c' }));
+  DB.get('journal').forEach(j => ev.push({ date: j.date, ico:'📆', title: j.title, color:'#3498db' }));
+  DB.get('reminders').filter(r => !r.done).forEach(r => ev.push({ date: r.date, ico:'⏰', title: r.title, color:'#9b59b6' }));
+  return ev;
+}
+function selectCalDay(d) { CAL_SELECTED = d; renderCalendar(); }
+function calPrev() { CAL_DATE.setMonth(CAL_DATE.getMonth()-1); renderCalendar(); }
+function calNext() { CAL_DATE.setMonth(CAL_DATE.getMonth()+1); renderCalendar(); }
+function calToday() { CAL_DATE = new Date(); CAL_SELECTED = todayISO; renderCalendar(); }
+
+/* =====================================================
+   АНАЛИТИКА
+   ===================================================== */
+function renderAnalytics() {
+  const visits = DB.get('visits');
+  const byMonth = {};
+  visits.forEach(v => {
+    const m = (v.date || '').slice(0,7);
+    if (!m) return;
+    if (!byMonth[m]) byMonth[m] = [];
+    byMonth[m].push(v.power || 0);
+  });
+  const months = Object.keys(byMonth).sort().slice(-6);
+  const maxP = months.length ? Math.max(...months.map(m => Math.max(...byMonth[m])), 10) : 10;
+  document.getElementById('chart-power').innerHTML = months.length ? months.map(m => {
+    const avg = byMonth[m].reduce((a,b)=>a+b,0)/byMonth[m].length;
+    const h = (avg/maxP)*100;
+    return `<div class="bar" style="height:${h}%"><b>${avg.toFixed(1)}</b><span>${m.slice(5)}</span></div>`;
+  }).join('') : '<div class="empty">Нет данных</div>';
+
+  const honey = DB.get('products').filter(p => p.type === 'Мёд');
+  const hByMonth = {};
+  honey.forEach(p => {
+    const m = (p.date || '').slice(0,7);
+    if (!m) return;
+    const q = p.unit === 'г' ? p.qty/1000 : p.qty;
+    hByMonth[m] = (hByMonth[m] || 0) + q;
+  });
+  const hMonths = Object.keys(hByMonth).sort().slice(-6);
+  const maxH = hMonths.length ? Math.max(...hMonths.map(m => hByMonth[m]), 1) : 1;
+  document.getElementById('chart-honey').innerHTML = hMonths.length ? hMonths.map(m => {
+    const h = (hByMonth[m]/maxH)*100;
+    return `<div class="bar" style="height:${h}%"><b>${hByMonth[m].toFixed(1)}</b><span>${m.slice(5)}</span></div>`;
+  }).join('') : '<div class="empty">Нет данных</div>';
+
+  const fin = DB.get('finance');
+  const fByMonth = {};
+  fin.forEach(f => {
+    const m = (f.date || '').slice(0,7);
+    if (!m) return;
+    if (!fByMonth[m]) fByMonth[m] = { in:0, out:0 };
+    if (f.type === 'in') fByMonth[m].in += f.sum;
+    else fByMonth[m].out += f.sum;
+  });
+  const fMonths = Object.keys(fByMonth).sort().slice(-6);
+  const maxF = fMonths.length ? Math.max(...fMonths.flatMap(m => [fByMonth[m].in, fByMonth[m].out]), 1) : 1;
+  document.getElementById('chart-finance').innerHTML = fMonths.length ? fMonths.map(m => {
+    const hIn = (fByMonth[m].in/maxF)*100;
+    const hOut = (fByMonth[m].out/maxF)*100;
+    return `<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;position:relative">
+      <div style="height:${hIn}%;background:linear-gradient(180deg, var(--success), #1e8449);border-radius:4px 4px 0 0;min-height:2px"></div>
+      <div style="height:${hOut}%;background:linear-gradient(180deg, var(--danger), #c0392b);border-radius:4px 4px 0 0;min-height:2px"></div>
+      <div style="position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--text-muted);white-space:nowrap">${m.slice(5)}</div>
+    </div>`;
+  }).join('') : '<div class="empty">Нет данных</div>';
+
+  const topByHive = {};
+  honey.forEach(p => {
+    const q = p.unit === 'г' ? p.qty/1000 : p.qty;
+    topByHive[p.hive] = (topByHive[p.hive] || 0) + q;
+  });
+  const sorted = Object.entries(topByHive).sort((a,b) => b[1] - a[1]).slice(0,5);
+  document.getElementById('top-hives').innerHTML = sorted.length ? sorted.map(([h,q], i) =>
+    `<div class="row"><span>${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} Улей №${h}</span><b>${q.toFixed(1)} кг</b></div>`
+  ).join('') : '<div class="empty">Нет данных</div>';
+}
+
+/* =====================================================
+   ГЛОБАЛЬНЫЙ ПОИСК
+   ===================================================== */
+function renderGlobalSearch() {
+  const screen = document.getElementById('s-search');
+  if (!screen || !screen.classList.contains('active')) return;
+  const q = (document.getElementById('global-search')?.value || '').toLowerCase().trim();
+  const el = document.getElementById('search-results');
+  const cntEl = document.getElementById('search-cnt');
+  if (!el) return;
+  if (!q) {
+    el.innerHTML = '<div class="empty">Введите запрос</div>';
+    if (cntEl) cntEl.textContent = '';
+    return;
+  }
+  const results = [];
+  DB.get('hives').forEach(h => {
+    const txt = `улей ${h.num} ${h.type || ''} ${h.queen || ''} ${h.queenBreed || ''}`.toLowerCase();
+    if (txt.includes(q)) results.push({ ico:'🐝', title:`Улей №${h.num}`, sub: `${h.type || ''}, матка: ${h.queen || ''}`, action:`openHive(${h.id})` });
+  });
+  DB.get('visits').forEach(v => {
+    const txt = `${v.note || ''} ${v.queen || ''} ${v.brood || ''} ${v.behavior || ''}`.toLowerCase();
+    if (txt.includes(q)) results.push({ ico:'📋', title:`Осмотр №${v.hive} от ${v.date}`, sub: v.note || v.queen || '', action:'' });
+  });
+  DB.get('journal').forEach(j => {
+    const txt = `${j.title || ''} ${j.text || ''}`.toLowerCase();
+    if (txt.includes(q)) results.push({ ico:'📆', title:j.title, sub: (j.text || '').slice(0,80), action:'' });
+  });
+  DB.get('treats').forEach(t => {
+    const txt = `${t.drug || ''} ${t.against || ''} ${t.note || ''}`.toLowerCase();
+    if (txt.includes(q)) results.push({ ico:'💊', title:`${t.drug} (№${t.hive})`, sub: `${t.against || ''}, ${t.date}`, action:'' });
+  });
+  DB.get('products').forEach(p => {
+    const txt = `${p.type || ''} ${p.note || ''}`.toLowerCase();
+    if (txt.includes(q)) results.push({ ico:'📦', title:`${p.type} ${p.qty}${p.unit}`, sub: p.note || p.date, action:'' });
+  });
+  GUIDE.forEach((cat, i) => {
+    cat.articles.forEach((a, j) => {
+      const txt = `${a.title} ${a.body}`.toLowerCase().replace(/<[^>]*>/g, ' ');
+      if (txt.includes(q)) results.push({ ico:'📖', title:a.title, sub: cat.title, action:`openGuideArticle(${i},${j})` });
+    });
+  });
+  if (cntEl) cntEl.textContent = results.length + ' найдено';
+  el.innerHTML = results.length ? results.slice(0, 30).map(r =>
+    `<div class="row clickable" ${r.action ? `onclick="${r.action}"` : ''}>
+      <div><span style="font-size:18px;margin-right:8px">${r.ico}</span><b>${r.title}</b>
+      <br><span style="font-size:12px;color:var(--text-muted)">${r.sub || ''}</span></div>
+    </div>`).join('') : '<div class="empty">Ничего не найдено</div>';
+}
+
+/* =====================================================
+   РЕНДЕР
+   ===================================================== */
+function fillHiveSelects() {
+  const hives = DB.get('hives').filter(h => !h.apiary || h.apiary === CURRENT_APIARY);
+  const opts = hives.map(h => `<option value="${h.num}">Улей №${h.num}</option>`).join('') || '<option value="">— нет ульев —</option>';
+  ['v-hive','t-hive','f-hive','p-hive'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.innerHTML = opts;
+  });
+}
+function renderPet() {
+  const xp = getXP();
+  const stage = getPetStage(xp);
+  const next = PET_STAGES.find(s => s.min > xp);
+  const prevArr = PET_STAGES.filter(s => s.min <= xp);
+  const prev = prevArr.length ? prevArr[prevArr.length - 1] : PET_STAGES[0];
+  document.getElementById('pet-avatar').textContent = stage.ico;
+  document.getElementById('pet-name').textContent = getPetName();
+  document.getElementById('pet-stage').textContent = 'Стадия: ' + stage.name;
+  if (next) {
+    const range = next.min - prev.min;
+    const pct = range > 0 ? Math.round((xp - prev.min) / range * 100) : 0;
+    document.getElementById('pet-progress').style.width = Math.min(100, Math.max(0, pct)) + '%';
+    document.getElementById('pet-xp').textContent = `${xp - prev.min} / ${range} XP до "${next.name}"`;
+  } else {
+    document.getElementById('pet-progress').style.width = '100%';
+    document.getElementById('pet-xp').textContent = `${xp} XP · максимум`;
+  }
+  document.getElementById('pet-speech').textContent = getPetAdvice();
+}
+function renderWeather() {
+  const w = DB.get('weather', null);
+  const card = document.getElementById('weather-card');
+  if (!card) return;
+  card.className = 'weather-card ' + weatherClass(w?.desc);
+  document.getElementById('w-ico').textContent = weatherEmoji(w?.desc);
+  document.getElementById('w-temp').textContent = w ? `${w.temp > 0 ? '+' : ''}${w.temp}°C` : '—°C';
+  document.getElementById('w-desc').textContent = w ? `${w.desc || ''} · ветер ${w.wind || 0} м/с` : 'Нажмите, чтобы ввести погоду';
+  document.getElementById('w-advice').innerHTML = weatherAdvice(w);
+  const ti = document.getElementById('w-input-temp');
+  if (ti && w) {
+    ti.value = w.temp;
+    const sel = document.getElementById('w-input-desc');
+    if (w.desc && sel) {
+      for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === w.desc) { sel.selectedIndex = i; break; }
+      }
+    }
+    const wInd = document.getElementById('w-input-wind');
+    if (wInd) wInd.value = w.wind || 0;
+  }
+  const recEl = document.getElementById('w-recommendations');
+  if (recEl) recEl.innerHTML = w ? weatherAdvice(w).split('<br>').map(l => `<div style="padding:6px 0">${l}</div>`).join('') : '<div class="empty">Введите погоду</div>';
+}
+function renderHome() {
+  renderPet();
+  renderWeather();
+  document.getElementById('st-hives').textContent = DB.get('hives').length;
+  document.getElementById('st-visits').textContent = DB.get('visits').length;
+  document.getElementById('st-honey').textContent = honeyTotal().toFixed(1);
+  document.getElementById('fact-text').textContent = getDailyFact();
+
+  const hives = DB.get('hives').filter(h => !h.apiary || h.apiary === CURRENT_APIARY);
+  const alerts = hives.map(h => ({ h, health: hiveHealth(h) })).filter(x => x.health.status !== 'green');
+  const alertsCard = document.getElementById('alerts-card');
+  if (alerts.length) {
+    alertsCard.style.display = 'block';
+    document.getElementById('alerts-cnt').textContent = alerts.length;
+    document.getElementById('alerts-list').innerHTML = alerts.map(({h, health}) => `
+      <div class="row clickable" onclick="openHive(${h.id})">
+        <div><span class="health ${health.status}"></span><b>Улей №${h.num}</b>
+        <br><span style="font-size:12px;color:var(--text-muted)">${health.reason}</span></div>
+        <span style="color:var(--text-muted)">›</span>
+      </div>`).join('');
+  } else alertsCard.style.display = 'none';
+
+  const auto = getAutoReminders();
+  const manual = DB.get('reminders').filter(r => !r.done).map(r => ({
+    date: r.date, title: r.title, days: Math.floor((new Date(r.date) - Date.now())/86400000), type:'manual', id: r.id
+  }));
+  const all = [...auto, ...manual].filter(r => r.days <= 14).sort((a,b) => a.days - b.days).slice(0, 5);
+  document.getElementById('reminders-cnt').textContent = all.length;
+  document.getElementById('reminders-preview').innerHTML = all.length ? all.map(r => {
+    const cls = r.days < 0 ? 'overdue' : r.days <= 3 ? 'soon' : '';
+    const when = r.days < 0 ? `просрочено ${-r.days} дн.` : r.days === 0 ? 'сегодня' : `через ${r.days} дн.`;
+    return `<div class="reminder ${cls}">${r.title}<br><span style="font-size:11px;color:var(--text-muted)">${when}</span></div>`;
+  }).join('') : '<div class="empty">Напоминаний нет</div>';
+
+  CURRENT_SEASON = currentSeason();
+  const prog = seasonProgress(CURRENT_SEASON);
+  document.getElementById('season-name').textContent = CURRENT_SEASON;
+  document.getElementById('season-progress').style.width = prog.pct + '%';
+  document.getElementById('season-info').textContent = `Выполнено ${prog.done} из ${prog.total} (${prog.pct}%)`;
+  updateDailyTasks();
+  renderDailyTasks();
+}
+function renderHives() {
+  const hives = DB.get('hives').filter(h => !h.apiary || h.apiary === CURRENT_APIARY);
+  document.getElementById('hives-cnt').textContent = hives.length ? hives.length + ' шт.' : '';
+  const el = document.getElementById('hives-list');
+  if (!hives.length) { el.innerHTML = '<div class="empty">Пока нет ульев.<br>Нажмите «Добавить улей»</div>'; return; }
+  el.innerHTML = hives.map(h => {
+    const visits = DB.get('visits').filter(v => v.hive == h.num).length;
+    const health = hiveHealth(h);
+    return `<div class="row clickable" onclick="openHive(${h.id})">
+      <div>
+        <span class="health ${health.status}"></span><b>Улей №${h.num}</b> <span style="font-size:11px;color:var(--text-muted)">· ${h.type}</span>
+        <br><span style="font-size:12px;color:var(--text-muted)">Сила: ${h.power}/10 · Матка: ${h.queen} · Осмотров: ${visits}</span>
+      </div>
+      <span class="badge ${h.power>=7?'green':h.power<=3?'red':''}">${h.power}</span>
+    </div>`;
+  }).join('');
+}
+function renderHive() {
+  if (!CURRENT_HIVE) return;
+  const h = CURRENT_HIVE; const health = hiveHealth(h);
+  document.getElementById('hive-title').innerHTML = `Улей №${h.num} <span class="health ${health.status}"></span>`;
+  document.getElementById('hive-info').innerHTML = `
+    <div class="row"><span>Состояние</span><b>${health.reason}</b></div>
+    <div class="row"><span>Тип улья</span><b>${h.type || '—'}</b></div>
+    <div class="row"><span>Сила семьи</span><b>${h.power}/10</b></div>
+    <div class="row"><span>Матка</span><b>${h.queen}</b></div>
+    <div class="row"><span>Год матки</span><b>${h.queenYear || '—'}</b></div>
+    <div class="row"><span>Порода</span><b>${h.queenBreed || '—'}</b></div>
+  `;
+  hiveTab('visits', document.querySelector('#hive-tabs button'));
+}
+function hiveTab(tab, btn) {
+  document.querySelectorAll('#hive-tabs button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderHiveContent(tab);
+}
+function renderHiveContent(tab) {
+  if (!CURRENT_HIVE) return;
+  const num = CURRENT_HIVE.num;
+  const el = document.getElementById('hive-content');
+  if (tab === 'visits') {
+    const list = DB.get('visits').filter(v => v.hive == num).reverse();
+    el.innerHTML = list.length ? list.map(v => `
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <b>${v.date}</b>
+        <span style="font-size:13px;color:var(--text-muted)">Сила: ${v.power}/10 · Матка: ${v.queen} · Расплод: ${v.brood}</span>
+        <span style="font-size:13px;color:var(--text-muted)">Корм: ${v.food} кг · ${v.behavior}</span>
+        ${v.note ? `<span style="font-size:13px;color:var(--text)">📝 ${v.note}</span>` : ''}
+        ${v.photo ? `<img src="${v.photo}" class="photo-thumb">` : ''}
+      </div>`).join('') : '<div class="empty">Осмотров нет</div>';
+  } else if (tab === 'treats') {
+    const list = DB.get('treats').filter(t => t.hive == num).reverse();
+    el.innerHTML = list.length ? list.map(t => `
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <b>${t.date} — ${t.drug}</b>
+        <span style="font-size:13px;color:var(--text-muted)">От: ${t.against} · Доза: ${t.dose || '—'}</span>
+      </div>`).join('') : '<div class="empty">Обработок нет</div>';
+  } else if (tab === 'feeds') {
+    const list = DB.get('feeds').filter(f => f.hive == num).reverse();
+    el.innerHTML = list.length ? list.map(f => `
+      <div class="row"><b>${f.date} — ${f.type}</b><span>${f.qty}</span></div>
+    `).join('') : '<div class="empty">Подкормок нет</div>';
+  } else if (tab === 'products') {
+    const list = DB.get('products').filter(p => p.hive == num).reverse();
+    el.innerHTML = list.length ? list.map(p => `
+      <div class="row"><span><b>${p.type}</b> · ${p.date}</span><span>${p.qty} ${p.unit}</span></div>
+    `).join('') : '<div class="empty">Продукции нет</div>';
+  } else if (tab === 'photos') {
+    const list = DB.get('visits').filter(v => v.hive == num && v.photo);
+    el.innerHTML = list.length ? list.map(v => `
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;color:var(--text-muted)">${v.date}</div>
+        <img src="${v.photo}" style="width:100%;border-radius:10px;margin-top:4px">
+      </div>`).join('') : '<div class="empty">Фото нет</div>';
+  } else if (tab === 'notes') {
+    el.innerHTML = `<textarea id="hive-note" rows="4" placeholder="Заметки...">${CURRENT_HIVE.note || ''}</textarea>
+      <button class="btn sm" onclick="saveHiveNote()">💾 Сохранить</button>`;
+  }
+}
+function saveHiveNote() {
+  if (!CURRENT_HIVE) return;
+  const hives = DB.get('hives');
+  const h = hives.find(x => x.id === CURRENT_HIVE.id);
+  if (h) { h.note = document.getElementById('hive-note').value; DB.set('hives', hives); CURRENT_HIVE = h; toast('Сохранено'); }
+}
+function renderQueens() {
+  const cycles = DB.get('queenCycles').slice().reverse();
+  const el = document.getElementById('queen-cycles');
+  if (!cycles.length) el.innerHTML = '<div class="empty">Нет активных циклов</div>';
+  else el.innerHTML = cycles.map(c => {
+    const d0 = new Date(c.start);
+    const stages = [['Прививка',0],['Маточники',6],['Выход матки',12],['Облёт',16],['Подсадка',21]];
+    const days = Math.floor((Date.now() - d0) / 86400000);
+    return `<div style="background:var(--input-bg);border-radius:10px;padding:10px;margin-top:8px">
+      <b>Цикл от ${c.start}</b>
+      ${stages.map(([n,d]) => {
+        const done = days >= d;
+        return `<div class="task" style="padding:6px 0">
+          <div class="checkbox" style="background:${done?'var(--success)':'transparent'};border-color:${done?'var(--success)':'var(--primary)'}">${done?'✓':''}</div>
+          <span style="${done?'color:var(--success)':''}">${n} — день ${d}${done?'':` (через ${d-days} дн.)`}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+  const ped = DB.get('pedigree');
+  document.getElementById('pedigree-list').innerHTML = ped.length ? ped.map(p =>
+    `<div class="tree-node">
+      <div class="name">👑 ${p.name}</div>
+      <div class="meta">${p.breed} · ${p.year} г. ${p.mother ? '· Мать: ' + p.mother : ''}</div>
+      ${p.note ? `<div class="meta">${p.note}</div>` : ''}
+    </div>`).join('') : '<div class="empty">Нет записей</div>';
+}
+function renderSeason() {
+  if (!CURRENT_SEASON) CURRENT_SEASON = currentSeason();
+  document.getElementById('season-tabs').innerHTML = Object.keys(SEASONS).map(s =>
+    `<span class="season ${s===CURRENT_SEASON?'active':''}" onclick="CURRENT_SEASON='${s}';renderSeason()">${s}</span>`
+  ).join('');
+  const done = DB.get('seasonDone_'+CURRENT_SEASON, {});
+  const custom = Object.keys(done).filter(k => k.startsWith('custom_')).map(k => k.replace('custom_',''));
+  const allTasks = [...SEASONS[CURRENT_SEASON].tasks, ...custom];
+  document.getElementById('season-list').innerHTML = allTasks.length ? allTasks.map(t => `
+    <div class="task ${done[t]?'done':''}" onclick="toggleSeasonTask('${t.replace(/'/g,"\\'")}')">
+      <div class="checkbox">${done[t]?'✓':''}</div><span>${t}</span>
+    </div>`).join('') : '<div class="empty">Нет работ</div>';
+  const prog = seasonProgress(CURRENT_SEASON);
+  document.getElementById('season-progress2').style.width = prog.pct + '%';
+}
+function renderProducts() {
+  const list = DB.get('products');
+  document.getElementById('products-cnt').textContent = list.length + ' записей';
+  const totals = {};
+  list.forEach(p => {
+    const qty = p.unit === 'г' ? p.qty/1000 : p.qty;
+    totals[p.type] = (totals[p.type] || 0) + qty;
+  });
+  document.getElementById('product-list').innerHTML = Object.keys(totals).length ? Object.entries(totals).map(([t,q]) =>
+    `<div class="row"><span>${t}</span><b>${q.toFixed(1)} кг</b></div>`).join('') : '<div class="empty">Склад пуст</div>';
+}
+function renderFinance() {
+  const list = DB.get('finance');
+  const income = list.filter(f => f.type === 'in').reduce((s,f) => s + f.sum, 0);
+  const expense = list.filter(f => f.type === 'out').reduce((s,f) => s + f.sum, 0);
+  const profit = income - expense;
+  document.getElementById('fin-income').textContent = income.toLocaleString('ru-RU');
+  document.getElementById('fin-expense').textContent = expense.toLocaleString('ru-RU');
+  document.getElementById('fin-profit').textContent = profit.toLocaleString('ru-RU');
+  document.getElementById('fin-profit').style.color = profit >= 0 ? 'var(--success)' : 'var(--danger)';
+  const cats = {};
+  list.forEach(f => { cats[f.cat] = (cats[f.cat] || 0) + (f.type === 'in' ? f.sum : -f.sum); });
+  const top = Object.entries(cats).sort((a,b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 5);
+  document.getElementById('fin-categories').innerHTML = top.length ? top.map(([c,s]) =>
+    `<div class="row"><span>${c}</span><span class="${s >= 0 ? 'amount-in' : 'amount-out'}">${s >= 0 ? '+' : ''}${s.toLocaleString('ru-RU')} ₽</span></div>`
+  ).join('') : '<div class="empty">Нет данных</div>';
+  document.getElementById('fin-history').innerHTML = list.slice().reverse().slice(0, 20).map(f =>
+    `<div class="finance-item">
+      <div><div style="font-weight:600">${f.cat}</div><div style="font-size:11px;color:var(--text-muted)">${f.date}${f.note ? ' · ' + f.note : ''}</div></div>
+      <div class="${f.type === 'in' ? 'amount-in' : 'amount-out'}">${f.type === 'in' ? '+' : '−'}${f.sum.toLocaleString('ru-RU')} ₽</div>
+    </div>`).join('') || '<div class="empty">Операций нет</div>';
+}
+function renderGuide() {
+  const search = (document.getElementById('guide-search')?.value || '').toLowerCase().trim();
+  const filtered = search ? GUIDE.filter(g =>
+    g.title.toLowerCase().includes(search) ||
+    g.sub.toLowerCase().includes(search) ||
+    g.articles.some(a => (a.title + a.body).toLowerCase().includes(search))
+  ) : GUIDE;
+  const el = document.getElementById('guide-categories');
+  if (!el) return;
+  el.innerHTML = filtered.length ? filtered.map(g => {
+    const i = GUIDE.indexOf(g);
+    return `<div class="cat-card" onclick="openGuideCat(${i})">
+      <div class="ico">${g.ico}</div>
+      <div style="flex:1"><div class="title">${g.title}</div><div class="sub">${g.sub}</div></div>
+      <div style="color:var(--text-muted);font-size:20px">›</div>
+    </div>`;
+  }).join('') : '<div class="empty">Ничего не найдено</div>';
+}
+function openGuideCat(i) {
+  const cat = GUIDE[i];
+  if (!cat) return;
+  if (cat.articles.length === 1) { openGuideArticle(i, 0); return; }
+  showModal(`<h2>${cat.ico} ${cat.title}</h2>
+    ${cat.articles.map((a, j) =>
+      `<div class="row clickable" onclick="closeModal();openGuideArticle(${i},${j})">
+        <span>${a.title}</span><span style="color:var(--text-muted)">›</span>
+      </div>`).join('')}
+    <button class="btn sec" style="margin-top:14px" onclick="closeModal()">Закрыть</button>`);
+}
+function openGuideArticle(i, j) {
+  const a = GUIDE[i]?.articles[j];
+  if (!a) return;
+  const read = DB.get('guideRead', []);
+  const key = i+'-'+j;
+  if (!read.includes(key)) {
+    read.push(key); DB.set('guideRead', read);
+    DB.set('guideReadToday', todayISO);
+    addXP(3);
+  }
+  document.getElementById('guide-article').innerHTML = `
+    <div class="card">
+      <h2>${a.title}</h2>
+      <div style="font-size:14px;line-height:1.6;color:var(--text)">${a.body}</div>
+    </div>
+    <button class="btn sec" onclick="goBack()">← Назад</button>`;
+  go('s-guide-article');
+}
+function renderReminders() {
+  const auto = getAutoReminders();
+  const manual = DB.get('reminders').filter(r => !r.done).map(r => ({
+    date: r.date, title: r.title, days: Math.floor((new Date(r.date) - Date.now())/86400000),
+    type:'manual', id: r.id, note: r.note
+  }));
+  const all = [...auto, ...manual].sort((a,b) => a.days - b.days);
+  document.getElementById('rem-cnt').textContent = all.length;
+  document.getElementById('rem-list').innerHTML = all.length ? all.map(r => {
+    const cls = r.days < 0 ? 'overdue' : r.days <= 3 ? 'soon' : '';
+    const when = r.days < 0 ? `Просрочено ${-r.days} дн.` : r.days === 0 ? 'Сегодня' : `Через ${r.days} дн.`;
+    return `<div class="reminder ${cls}">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="flex:1">
+          <b>${r.title}</b>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">${r.date} · ${when}${r.note ? ' · ' + r.note : ''}</div>
+        </div>
+        ${r.id ? `<button class="btn sm" style="width:auto;padding:5px 10px;margin:0" onclick="toggleReminder(${r.id})">✓</button>` : ''}
+      </div>
+    </div>`;
+  }).join('') : '<div class="empty">Напоминаний нет</div>';
+}
+function renderJournal() {
+  const search = (document.getElementById('journal-search')?.value || '').toLowerCase();
+  const list = DB.get('journal').slice().reverse();
+  const filtered = search ? list.filter(j => (j.title + ' ' + j.text).toLowerCase().includes(search)) : list;
+  document.getElementById('journal-cnt').textContent = list.length + ' записей';
+  document.getElementById('journal-list').innerHTML = filtered.length ? filtered.map(j =>
+    `<div class="row" style="flex-direction:column;align-items:flex-start;gap:4px;cursor:pointer" onclick="deleteJournal(${j.id})">
+      <b>${j.title}</b>
+      <span style="font-size:11px;color:var(--text-muted)">${j.date}</span>
+      <span style="font-size:13px;color:var(--text)">${j.text}</span>
+    </div>`).join('') : '<div class="empty">Записей нет</div>';
+}
+function renderAchievements() {
+  const unlocked = DB.get('achievements', []);
+  document.getElementById('ach-cnt').textContent = unlocked.length + '/' + ACHIEVEMENTS.length;
+  document.getElementById('ach-list').innerHTML = ACHIEVEMENTS.map(a => {
+    const u = unlocked.includes(a.id);
+    return `<div class="ach ${u?'':'locked'}">
+      <div class="ico">${a.ico}</div>
+      <div class="txt"><div class="name">${a.name}</div><div class="desc">${a.desc}</div></div>
+      <div>${u ? '✅' : '🔒'}</div>
+    </div>`;
+  }).join('');
+}
+function renderChallenges() {
+  const done = DB.get('challengesDone', []);
+  document.getElementById('challenges-list').innerHTML = CHALLENGES.map(c => {
+    const d = done.includes(c.id);
+    return `<div class="quest" style="${d?'opacity:.6':''}">
+      <div class="title">${d?'✅ ':''}${c.ico} ${c.name}</div>
+      <div class="desc">${c.desc}</div>
+      <div class="reward">Награда: +${c.reward} XP</div>
+    </div>`;
+  }).join('');
+}
+function renderCollection() {
+  const products = DB.get('products');
+  const types = ['Мёд','Прополис','Перга','Пыльца','Воск','Маточное молочко','Трутневый гомогенат'];
+  document.getElementById('collection-list').innerHTML = types.map(t => {
+    const has = products.some(p => p.type === t);
+    return `<div class="row"><span>${has?'✅':'🔒'} ${t}</span><span style="font-size:11px;color:var(--text-muted)">${has?'Собрано':'Не собрано'}</span></div>`;
+  }).join('');
+}
+const QUESTS = [
+  { id:'q_visit_today', title:'📋 Осмотреть улей', desc:'Запишите осмотр', reward:10, check:() => DB.get('visits').some(v => v.date === todayISO) },
+  { id:'q_product_week', title:'📦 Собрать продукцию', desc:'Внесите продукцию за неделю', reward:15, check:() => { const d = new Date(Date.now() - 7*86400000).toISOString().split('T')[0]; return DB.get('products').some(p => p.date >= d); } },
+  { id:'q_finance', title:'💰 Финансовая операция', desc:'Внесите доход/расход', reward:10, check:() => DB.get('finance').some(f => f.date === todayISO) },
+  { id:'q_guide', title:'📚 Прочитать статью', desc:'Любую статью', reward:10, check:() => DB.get('guideReadToday') === todayISO },
+  { id:'q_scheme', title:'🗺 Навести порядок', desc:'Все ульи на схеме', reward:20, check:() => { const h = DB.get('hives'); return h.length > 0 && h.every(x => x.x !== undefined); } },
+  { id:'q_pedigree', title:'🌳 Родословная', desc:'Матка в родословной', reward:20, check:() => DB.get('pedigree').length >= 1 },
+  { id:'q_calc', title:'🧮 Расчёт', desc:'Используйте калькулятор', reward:10, check:() => DB.get('calcUsed', false) },
+  { id:'q_journal', title:'📆 Дневник', desc:'Запись в дневнике', reward:10, check:() => DB.get('journal').some(j => j.date === todayISO) },
+  { id:'q_weather', title:'🌦 Погода', desc:'Введите погоду', reward:10, check:() => DB.get('weather', null) !== null },
+  { id:'q_label', title:'📄 Этикетка', desc:'Создайте этикетку', reward:15, check:() => DB.get('labelCreated', false) }
+];
+function renderQuests() {
+  const done = DB.get('questsDone', {});
+  let changed = false;
+  let totalReward = 0;
+  const html = QUESTS.map(q => {
+    let isDone = false;
+    try { isDone = q.check(); } catch(e) {}
+    const alreadyDone = done[q.id];
+    if (isDone && !alreadyDone) {
+      done[q.id] = true;
+      totalReward += q.reward;
+      changed = true;
+    }
+    return `<div class="quest" style="${(isDone || alreadyDone) ? 'opacity:.6':''}">
+      <div class="title">${(isDone || alreadyDone)?'✅ ':''}${q.title}</div>
+      <div class="desc">${q.desc}</div>
+      <div class="reward">+${q.reward} XP</div>
+    </div>`;
+  }).join('');
+  document.getElementById('quests-list').innerHTML = html;
+  if (changed) {
+    DB.set('questsDone', done);
+    if (totalReward > 0) setXP(getXP() + totalReward);
+  }
+}
+function renderSettings() {
+  const list = DB.get('apiaries', [{ id: 1, name: 'Основная' }]);
+  document.getElementById('apiaries-list').innerHTML = list.map(a => `
+    <div class="row clickable" onclick="switchApiary(${a.id})">
+      <span>${a.id === CURRENT_APIARY ? '✅' : '⬜️'} ${a.name}</span>
+      <span style="font-size:12px;color:var(--text-muted)">${DB.get('hives').filter(h => h.apiary === a.id || (!h.apiary && a.id === 1)).length} ульев</span>
+    </div>`).join('');
+  const pn = document.getElementById('pet-name-input');
+  if (pn && document.activeElement !== pn) pn.value = getPetName();
+}
+const DAILY_TASKS = [
+  { id:'open', text:'Открыть приложение', xp:1, check:() => true },
+  { id:'visit_today', text:'Записать осмотр', xp:5, check:() => DB.get('visits').some(v => v.date === todayISO) },
+  { id:'guide_read', text:'Прочитать статью', xp:3, check:() => DB.get('guideReadToday') === todayISO },
+  { id:'finance_or_product', text:'Продукция или финансы', xp:3, check:() =>
+    DB.get('products').some(p => p.date === todayISO) || DB.get('finance').some(f => f.date === todayISO) }
+];
+function renderDailyTasks() {
+  const completed = DB.get('dailyDone_' + todayISO, {});
+  document.getElementById('daily-tasks').innerHTML = DAILY_TASKS.map(t => {
+    const done = completed[t.id];
+    return `<div class="task ${done?'done':''}">
+      <div class="checkbox">${done?'✓':''}</div>
+      <span>${t.text}</span>
+      <span style="margin-left:auto;font-size:12px;color:${done?'var(--success)':'var(--primary)'};font-weight:600">+${t.xp} XP</span>
+    </div>`;
+  }).join('');
+}
+function updateDailyTasks() {
+  const completed = DB.get('dailyDone_' + todayISO, {});
+  let changed = false;
+  DAILY_TASKS.forEach(t => {
+    if (!completed[t.id]) {
+      try { if (t.check()) { completed[t.id] = true; DB.set('xp', getXP() + t.xp); changed = true; } } catch(e) {}
+    }
+  });
+  if (changed) {
+    DB.set('dailyDone_' + todayISO, completed);
+    setTimeout(() => {
+      try { checkLevelUp(); } catch(e) {}
+      try { checkAchievements(); } catch(e) {}
+    }, 100);
+  }
+}
+
+/* =====================================================
+   ЭКСПОРТ / ИМПОРТ
+   ===================================================== */
+function exportData() {
+  const data = {};
+  ['hives','visits','treats','feeds','products','finance','queenCycles','apiaries','xp','achievements',
+   'seasonDone_Весна','seasonDone_Лето','seasonDone_Осень','seasonDone_Зима',
+   'reminders','journal','pedigree','questsDone','guideRead','challengesDone',
+   'theme','petName','weather','labelCreated','level','calcUsed'].forEach(k => data[k] = DB.get(k));
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'paseka_backup_' + todayISO + '.json';
+  a.click(); toast('📤 Файл сохранён');
+}
+function importData() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        Object.entries(data).forEach(([k, v]) => DB.set(k, v));
+        toast('📥 Загружено'); refreshAll();
+      } catch { toast('❌ Ошибка файла'); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+function resetAll() {
+  if (!confirm('Удалить ВСЕ данные?')) return;
+  if (!confirm('Точно?')) return;
+  Object.keys(localStorage).filter(k => k.startsWith('paseka_')).forEach(k => localStorage.removeItem(k));
+  toast('🗑 Удалено'); setTimeout(() => location.reload(), 800);
+}
+function openHive(id) {
+  CURRENT_HIVE = DB.get('hives').find(h => h.id === id);
+  if (!CURRENT_HIVE) return;
+  go('s-hive'); renderHive();
+}
+
+/* =====================================================
+   ХЕЛПЕРЫ
+   ===================================================== */
+function honeyTotal() {
+  return DB.get('products').filter(p => p.type === 'Мёд').reduce((s,p) =>
+    s + (p.unit === 'г' ? p.qty/1000 : p.unit === 'кг' ? p.qty : 0), 0);
+}
+function financeProfit() {
+  const list = DB.get('finance');
+  return list.filter(f => f.type === 'in').reduce((s,f) => s + f.sum, 0) -
+         list.filter(f => f.type === 'out').reduce((s,f) => s + f.sum, 0);
+}
+
+/* =====================================================
+   ОБНОВИТЬ ВСЁ
+   ===================================================== */
+function refreshAll() {
+  try {
+    renderHome();
+    renderHives();
+    renderScheme();
+    renderQueens();
+    renderSeason();
+    renderProducts();
+    renderFinance();
+    renderGuide();
+    renderCalendar();
+    renderAnalytics();
+    renderReminders();
+    renderJournal();
+    renderAchievements();
+    renderChallenges();
+    renderQuests();
+    renderCollection();
+    renderSettings();
+    renderWeather();
+    const searchScreen = document.getElementById('s-search');
+    if (searchScreen && searchScreen.classList.contains('active')) renderGlobalSearch();
+    fillHiveSelects();
+    if (document.getElementById('s-hive').classList.contains('active')) renderHive();
+  } catch(e) { console.warn('refreshAll error:', e); }
+}
+
+/* =====================================================
+   СТАРТ
+   ===================================================== */
+(function init() {
+  try {
+    applyTheme(DB.get('theme', 'honey'));
+    const yEl = document.getElementById('lbl-year');
+    if (yEl) yEl.value = new Date().getFullYear();
+    if (!DB.get('weather', null)) {
+      DB.set('weather', { temp: 18, desc: '☀️ Ясно', wind: 2, date: todayISO });
+    }
+    refreshAll();
+    renderLabel();
+    setInterval(() => { try { refreshAll(); } catch(e) {} }, 60000);
+  } catch(e) {
+    console.error('Init error:', e);
+    document.body.innerHTML = '<div style="padding:20px;font-family:sans-serif">Ошибка инициализации. Обновите страницу.</div>';
+  }
+})();
+</script>
+</body>
+</html>
